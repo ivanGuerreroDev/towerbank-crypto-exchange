@@ -37,6 +37,11 @@ const swapRequestSchema = mongoose.Schema(
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'Exchange',
       required: true,
+    },
+    user: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'User',
+      required: true,
     }
   },
   {

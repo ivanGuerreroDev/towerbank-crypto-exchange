@@ -3,7 +3,7 @@ const Joi = require('joi');
 const getExhanges = {
 
 };
-const quoteBuyAsset = {
+const quoteSwapRequest = {
   body: Joi.object().keys({
     pair: Joi.string().required(),
     exchangeId: Joi.string().required(),
@@ -11,8 +11,10 @@ const quoteBuyAsset = {
   }),
 }
 
-const acceptQuoteBuyAsset = {
+const acceptQuoteAsset = {
   body: Joi.object().keys({
+    userId: Joi.string().required(),
+    exchangeId: Joi.string().required(),
     quoteId: Joi.string().required()
   }),
 }
@@ -25,7 +27,7 @@ const syncSwapRequest = {
 
 module.exports = {
   getExhanges,
-  quoteBuyAsset,
-  acceptQuoteBuyAsset,
+  quoteSwapRequest,
+  acceptQuoteAsset,
   syncSwapRequest
 };

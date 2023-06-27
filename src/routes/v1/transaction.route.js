@@ -7,12 +7,12 @@ const exchangeController = require('../../controllers/exchange.controller');
 const router = express.Router();
 
 router
-  .route('/quoteBuyAsset')
-  .post(validate(exchangeValidation.quoteBuyAsset), exchangeController.quoteBuyAsset);
+  .route('/quoteSwapRequest')
+  .post(validate(exchangeValidation.quoteSwapRequest), exchangeController.quoteSwapRequest);
 
 router
-  .route('/acceptQuoteBuyAsset')
-  .post(validate(exchangeValidation.acceptQuoteBuyAsset), exchangeController.acceptQuoteBuyAsset);
+  .route('/acceptQuoteAsset')
+  .post(validate(exchangeValidation.acceptQuoteAsset), exchangeController.acceptQuoteAsset);
 
 router
   .route('/syncSwapRequest')
@@ -29,7 +29,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /transaction/quoteBuyAsset/:
+ * /transaction/quoteSwapRequest/:
  *   post:
  *     summary: Quote buy asset
  *     description: Quote buy asset.

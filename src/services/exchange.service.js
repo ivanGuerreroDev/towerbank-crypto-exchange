@@ -1,10 +1,9 @@
 const httpStatus = require('http-status');
-const { Exchange, SwapRequest } = require('../models');
+const { Exchange, SwapRequest, User } = require('../models');
 const ApiError = require('../utils/ApiError');
-const { ApiCall } = require('../utils/Api');
+const { ApiCall, TowerbankApi } = require('../utils/Api');
 const { Spot } = require('@binance/connector')
 const {SignatureAndTimestampBinance} = require('../utils/SignatureBinance')
-
 const apiKey = 'rNVAoZjKQorYjpnHQFRHn1Q30hdu5dAnRmLvuWl2VE1ml5BpYSrzEs0Lylpa9EN5'
 const apiSecret = 'YB33MhssrFmbAsEmcuWOoDQWT6F2upf3SXKbf4xDHBO2X2BUTfKLmk5sd8oKndxv'
 const client = new Spot(apiKey, apiSecret, { baseURL: 'https://testnet.binance.vision'})
@@ -87,7 +86,7 @@ const getpriceByPairAllExchanges = async (pair) => {
   return prices;
 };
 
-const quoteBuyAsset = async (exchangeId, pair, amount) => {
+const quoteSwapRequest = async (exchangeId, pair, amount) => {
   const exchange = await Exchange.findOne({_id: exchangeId});
   const pairArr = pair.split("/");
   if(exchange?.name === "Binance"){
@@ -102,7 +101,7 @@ const quoteBuyAsset = async (exchangeId, pair, amount) => {
       base: exchange.api_url,
       path: '/sapi/v1/convert/getQuote',
       api_key: exchange.api_key,
-      params: {
+      data: {
         ...params,
         signature: binanceSignatureTimestamp.signature,
         timestamp: binanceSignatureTimestamp.timestamp
@@ -115,19 +114,20 @@ const quoteBuyAsset = async (exchangeId, pair, amount) => {
   }
 };
 
-const acceptQuoteBuyAsset = async (exchangeId, quoteId) => {
+const acceptQuoteAsset = async (userId, exchangeId, quoteId) => {
   const exchange = await Exchange.findOne({_id: exchangeId});
   if(exchange?.name === "Binance"){
     const {data : binanceResponse, status } = await ApiCall({
       base: exchange.api_url,
       path: '/sapi/v1/convert/acceptQuote',
-      params: {
+      data: {
         quoteId: quoteId
       },
       method: 'post'
     })
     if(binanceResponse && status === 200){
       await SwapRequest.create({
+        "user": userId,
         "orderId": binanceResponse.orderId,
         "createTime":binanceResponse.createTime,
         "orderStatus":binanceResponse.orderStatus //PROCESS/ACCEPT_SUCCESS/SUCCESS/FAIL
@@ -139,16 +139,43 @@ const acceptQuoteBuyAsset = async (exchangeId, quoteId) => {
 
 const syncSwapRequest = async (orderId) => {
   const swapRequests = await SwapRequest.findOne({orderId: orderId, status: "PROCESS"});
-  const {data : binanceResponse, status } = await ApiCall({
+  const {data : binanceResponse, status : binanceSwapStatus } = await ApiCall({
     base: swapRequests.exchange.api_url,
     path: '/sapi/v1/convert/orderId',
-    params: {
+    data: {
       orderId: orderId
     },
-    method: 'get'
+    method: 'post'
   })
-  if(binanceResponse && status === 200){
-    await SwapRequest.updateOne({orderId: orderId}, binanceResponse)
+  const swapRequestData = await SwapRequest.updateOne({orderId: orderId}, binanceResponse)
+  const userData = await User.findOne({_id: swapRequestData.user})
+  const towerbank_account_id = userData.towerbank_account_id
+
+  let amount, transactionType
+  if(binanceResponse.toAsset === 'USDT') {
+    amount = binanceResponse.toAmount
+    transactionType = "purchase"
+  }
+  if(binanceResponse.from === 'USDT'){
+    amount = binanceResponse.fromAmount
+    transactionType = "sale"
+  }
+
+  const {data : towerbankTrxResponse, status : towerbankTrxStatus } = await ApiCall({
+    base: TowerbankApi,
+    path: '/v1/transaction',
+    data: {
+      accountId: towerbank_account_id,
+      amount: parseFloat(amount),
+      transactionType: transactionType
+    },
+    method: 'post'
+  })
+
+  if(
+    binanceResponse && binanceSwapStatus === 200 &&
+    towerbankTrxResponse && towerbankTrxStatus === 200
+  ){
     return binanceResponse;
   }
 }
@@ -159,7 +186,7 @@ module.exports = {
   getExchanges,
   getExchangeById,
   getpriceByPairAllExchanges,
-  quoteBuyAsset,
-  acceptQuoteBuyAsset,
-  syncSwapRequest
+  quoteSwapRequest,
+  acceptQuoteAsset,
+  syncSwapRequest,
 };

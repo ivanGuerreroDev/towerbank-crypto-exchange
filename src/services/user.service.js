@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const { User } = require('../models');
 const ApiError = require('../utils/ApiError');
-
+const towerbank_account_id = "18400aee-00a5-11ee-be56-0242ac120002"
 /**
  * Create a user
  * @param {Object} userBody
@@ -11,7 +11,10 @@ const createUser = async (userBody) => {
   if (await User.isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
-  return User.create(userBody);
+  return User.create({
+    ...userBody,
+    towerbank_account_id: towerbank_account_id
+  });
 };
 
 /**

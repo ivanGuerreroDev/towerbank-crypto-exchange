@@ -3,20 +3,36 @@ const { toJSON } = require('./plugins');
 
 const subAccountSchema = mongoose.Schema(
   {
-    userId: {
+    user_id: {
       type: String,
       required: true
     },
-    subAccountId: {
+    sub_account_id: {
       type: String,
       required: true,
     },
-    accountId: {
+    account_id: {
       type: String,
       required: true,
     },
-    exchangeId: {
+    exchange_id: {
       type: String,
+      required: true,
+    },
+    is_freeze: {
+      type: Boolean,
+      required: true,
+    },
+    create_time: {
+      type: String,
+      required: true,
+    },
+    is_managed_sub_account: {
+      type: Boolean,
+      required: true,
+    },
+    is_asset_management_sub_account: {
+      type: Boolean,
       required: true,
     },
     active: {

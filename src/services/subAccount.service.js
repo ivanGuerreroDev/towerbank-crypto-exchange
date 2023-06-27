@@ -4,6 +4,7 @@ const ApiError = require('../utils/ApiError');
 const { ApiCall } = require('../utils/Api');
 const { Spot } = require('@binance/connector')
 const {SignatureAndTimestampBinance} = require('../utils/SignatureBinance')
+import { guiid as uuidv6 } from 'uuid';
 
 const getAllSubAccounts = async (userId) => {
   const AllSubAccounts = await SubAccount.filter({_userId: userId});
@@ -61,7 +62,33 @@ const addSubAccount = async (userId) => {
         }
       });
 
-      res.json(response.data);
+      if(response.data){
+
+        switch (Exchange.name) {
+          case "Binance":
+
+            SubAccount.create({
+              user_id: userId,
+              sub_account_id: guiid(),
+
+            });
+
+            break;
+          case "Kraken":
+
+            SubAccount.create({
+              user_id: userId,
+              sub_account_id: guiid(),
+
+            });
+
+
+            break;
+
+        }
+
+      }
+
     };
   }
 }

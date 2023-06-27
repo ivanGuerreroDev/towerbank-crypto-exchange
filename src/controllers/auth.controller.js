@@ -1,11 +1,12 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
-const { authService, userService, tokenService, emailService } = require('../services');
+const { authService, userService, tokenService, emailService , subAccountService} = require('../services');
 
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
   const tokens = await tokenService.generateAuthTokens(user);
-  res.status(httpStatus.CREATED).send({ user, tokens });
+  const subAccounts = await subAccountService.addSubAccount(user.id);
+  res.status(httpStatus.CREATED).send({ user, tokens , subAccounts});
 });
 
 const login = catchAsync(async (req, res) => {

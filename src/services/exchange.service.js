@@ -32,11 +32,48 @@ const getPriceByAssetAllExchanges = async (coinId) => {
           price: response.data.price
         })
       } else if(exchange.name==="Kraken"){
-
+        const {data : krakenResponse, status } = await ApiCall({
+          base: exchange.api_url,
+          path: '/0/public/Ticker',
+          method: 'get',
+          params: {
+            pair: coinId+'usdt'
+          }
+        })
+        if(krakenResponse && status === 200){
+          prices.push({
+            id: exchange._id,
+            name: exchange.name,
+            price: krakenResponse.result[Object.keys(krakenResponse.result)[0]].a[0]
+          }
+          )
+        }
       } else if(exchange.name==="Buda"){
-
+        const {data : budaResponse, status } = await ApiCall({
+          base: exchange.api_url,
+          path: '/markets/'+coinId+'-usdt/ticker',
+          method: 'get'
+        })
+        if(budaResponse && status === 200){
+          prices.push({
+            id: exchange._id,
+            name: exchange.name,
+            price: budaResponse.last_price[0]
+          })
+        }
       } else if(exchange.name==="Bitstamp"){
-
+        const {data : bitstampResponse, status } = await ApiCall({
+          base: exchange.api_url,
+          path: '/ticker/'+coinId+'usdt',
+          method: 'get'
+        })
+        if(bitstampResponse && status === 200){
+          prices.push({
+            id: exchange._id,
+            name: exchange.name,
+            price: bitstampResponse.ask
+          })
+        }
       }
     }
   }

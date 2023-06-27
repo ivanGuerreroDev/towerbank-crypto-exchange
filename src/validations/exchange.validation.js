@@ -5,7 +5,7 @@ const getExhanges = {
 };
 const quoteBuyAsset = {
   body: Joi.object().keys({
-    coinId: Joi.string().required(),
+    pair: Joi.string().required(),
     exchangeId: Joi.string().required(),
     amount: Joi.number().required()
   }),

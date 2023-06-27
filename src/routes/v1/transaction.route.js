@@ -43,11 +43,11 @@ module.exports = router;
  *           schema:
  *             type: object
  *             required:
- *               - coinId
+ *               - pair
  *               - exchangeId
  *               - amount
  *             properties:
- *               coinId:
+ *               pair:
  *                 type: string
  *               exchangeId:
  *                 type: string

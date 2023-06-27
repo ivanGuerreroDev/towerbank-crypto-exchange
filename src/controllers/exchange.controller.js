@@ -14,15 +14,15 @@ const getExchangeById = catchAsync(async (req, res) => {
   res.status(httpStatus.ACCEPTED).send(exchanges);
 });
 
-const getPriceByAssetAllExchanges = catchAsync(async (req, res) => {
-  const { coinId } = req.params
-  const prices = await exchangeService.getPriceByAssetAllExchanges(coinId);
+const getpriceByPairAllExchanges = catchAsync(async (req, res) => {
+  const { pair } = req.params
+  const prices = await exchangeService.getpriceByPairAllExchanges(pair);
   res.status(httpStatus.ACCEPTED).send(prices);
 });
 
 const quoteBuyAsset = catchAsync(async (req, res) => {
-  const { coinId, exchangeId, amount } = req.body
-  const prices = await exchangeService.quoteBuyAsset(exchangeId, coinId, amount);
+  const { pair, exchangeId, amount } = req.body
+  const prices = await exchangeService.quoteBuyAsset(exchangeId, pair, amount);
   res.status(httpStatus.ACCEPTED).send(prices);
 });
 
@@ -43,7 +43,7 @@ const syncSwapRequest = catchAsync(async (req, res) => {
 module.exports = {
   getExchanges,
   getExchangeById,
-  getPriceByAssetAllExchanges,
+  getpriceByPairAllExchanges,
   quoteBuyAsset,
   acceptQuoteBuyAsset,
   syncSwapRequest

@@ -24,14 +24,15 @@ const getExchangeById = async (id) => {
 };
 
 
-const getPriceByAssetAllExchanges = async (coinId) => {
+const getpriceByPairAllExchanges = async (pair) => {
   const exchanges = await Exchange.find();
   const prices = [];
 
   for (const exchange of exchanges) {
     if(exchange?.active){
       if(exchange?.api_url && exchange?.name==="Binance"){
-        const response = await client.avgPrice(coinId+'usdt')
+        const pairArr = pair.split("/");
+        const response = await client.avgPrice(pairArr[0]+pairArr[1])
         if(response && response.status === 200) prices.push({
           id: exchange._id,
           name: exchange.name,
@@ -43,7 +44,7 @@ const getPriceByAssetAllExchanges = async (coinId) => {
           path: '/0/public/Ticker',
           method: 'get',
           params: {
-            pair: coinId+'usdt'
+            pair: pairArr[0]+pairArr[1]
           }
         })
         if(krakenResponse && status === 200){
@@ -57,7 +58,7 @@ const getPriceByAssetAllExchanges = async (coinId) => {
       } else if(exchange.name==="Buda"){
         const {data : budaResponse, status } = await ApiCall({
           base: exchange.api_url,
-          path: '/markets/'+coinId+'-usdt/ticker',
+          path: '/markets/'+pairArr[0]+'-'+pairArr[1]+'/ticker',
           method: 'get'
         })
         if(budaResponse && status === 200){
@@ -70,7 +71,7 @@ const getPriceByAssetAllExchanges = async (coinId) => {
       } else if(exchange.name==="Bitstamp"){
         const {data : bitstampResponse, status } = await ApiCall({
           base: exchange.api_url,
-          path: '/ticker/'+coinId+'usdt',
+          path: '/ticker/'+pairArr[0]+pairArr[1],
           method: 'get'
         })
         if(bitstampResponse && status === 200){
@@ -86,12 +87,13 @@ const getPriceByAssetAllExchanges = async (coinId) => {
   return prices;
 };
 
-const quoteBuyAsset = async (exchangeId, coinId, amount) => {
+const quoteBuyAsset = async (exchangeId, pair, amount) => {
   const exchange = await Exchange.findOne({_id: exchangeId});
+  const pairArr = pair.split("/");
   if(exchange?.name === "Binance"){
     const params = {
-      fromAsset: 'USDT',
-      toAsset: coinId,
+      fromAsset: pairArr[1],
+      toAsset: pairArr[0],
       fromAmount: amount,
       walletType: 'FUNDING'
     }
@@ -156,7 +158,7 @@ const syncSwapRequest = async (orderId) => {
 module.exports = {
   getExchanges,
   getExchangeById,
-  getPriceByAssetAllExchanges,
+  getpriceByPairAllExchanges,
   quoteBuyAsset,
   acceptQuoteBuyAsset,
   syncSwapRequest

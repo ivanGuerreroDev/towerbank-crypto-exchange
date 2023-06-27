@@ -15,8 +15,8 @@ router
   .get(exchangeController.getExchangeById);
 
 router
-  .route('/priceByAssetAllExchanges/:coinId')
-  .get(exchangeController.getPriceByAssetAllExchanges);
+  .route('/priceByPairAllExchanges/:pair')
+  .get(exchangeController.getpriceByPairAllExchanges);
 
 
 
@@ -88,7 +88,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /exchange/priceByAssetAllExchanges/{coinId}:
+ * /exchange/priceByPairAllExchanges/{pair}:
  *   get:
  *     summary: Get price by asset
  *     description: Get price by asset in all exchanges.
@@ -97,11 +97,11 @@ module.exports = router;
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: coinId
+ *         name: pair
  *         required: true
  *         schema:
  *           type: string
- *         description: Asset id
+ *         description: Pair assets: BTC/USDT
  *     responses:
  *       "200":
  *         description: OK

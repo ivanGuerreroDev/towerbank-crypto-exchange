@@ -3,6 +3,8 @@ const authRoute = require('./auth.route');
 const userRoute = require('./user.route');
 const docsRoute = require('./docs.route');
 const assetRoute = require('./asset.route');
+const exchangeRoute = require('./exchange.route');
+
 const config = require('../../config/config');
 
 const router = express.Router();
@@ -19,6 +21,10 @@ const defaultRoutes = [
   {
     path: '/asset',
     route: assetRoute,
+  },
+  {
+    path: '/exchange',
+    route: exchangeRoute,
   },
 ];
 

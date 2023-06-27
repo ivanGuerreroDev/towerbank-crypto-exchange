@@ -6,7 +6,7 @@ const { assetService } = require('../services');
 
 const getAssets = catchAsync(async (req, res) => {
   const assets = await assetService.getAssets();
-  res.status(httpStatus.CREATED).send(assets);
+  res.status(httpStatus.ACCEPTED).send(assets);
 });
 
 module.exports = {

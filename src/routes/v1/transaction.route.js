@@ -7,6 +7,10 @@ const exchangeController = require('../../controllers/exchange.controller');
 const router = express.Router();
 
 router
+  .route('/newOrder')
+  .post(validate(exchangeValidation.newOrder), exchangeController.newOrder);
+
+router
   .route('/quoteSwapRequest')
   .post(validate(exchangeValidation.quoteSwapRequest), exchangeController.quoteSwapRequest);
 
@@ -25,6 +29,50 @@ module.exports = router;
  * tags:
  *   name: Transaction
  *   description: Crypto transactions
+ */
+
+/**
+ * @swagger
+ * /transaction/newOrderTrade/:
+ *   post:
+ *     summary: Create new order trade
+ *     description: Create new order trade.
+ *     tags: [Transaction]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - symbol
+ *               - side
+ *               - type
+ *               - quoteOrderQty
+ *             properties:
+ *               symbol:
+ *                 type: string
+ *               side:
+ *                 type: string
+ *               type:
+ *                 type: string
+ *               quoteOrderQty:
+ *                 type: number
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *                $ref: '#/components/schemas/Exchange'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         $ref: '#/components/responses/NotFound'
  */
 
 /**

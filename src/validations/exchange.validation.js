@@ -3,6 +3,16 @@ const Joi = require('joi');
 const getExhanges = {
 
 };
+
+const newOrder = {
+  body: Joi.object().keys({
+    symbol: Joi.string().required(),
+    side: Joi.string().required(),
+    type: Joi.string().required(),
+    quoteOrderQty: Joi.string().number()
+  }),
+}
+
 const quoteSwapRequest = {
   body: Joi.object().keys({
     pair: Joi.string().required(),
@@ -26,6 +36,7 @@ const syncSwapRequest = {
 }
 
 module.exports = {
+  newOrder,
   getExhanges,
   quoteSwapRequest,
   acceptQuoteAsset,

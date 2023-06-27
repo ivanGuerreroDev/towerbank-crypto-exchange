@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Exchange, SwapRequest, User } = require('../models');
+const { Exchange, SwapRequest, User, Order } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { ApiCall, TowerbankApi } = require('../utils/Api');
 const { Spot } = require('@binance/connector')
@@ -85,6 +85,87 @@ const getpriceByPairAllExchanges = async (pair) => {
   }
   return prices;
 };
+
+const newOrderTrade = async (userId, exchangeId, symbol, amount, side) => {
+  const exchange = await Exchange.findOne({_id: exchangeId});
+  if(exchange?.name === "Binance"){
+    const params = {
+      symbol: symbol.upperCase(),
+      side: side.toUpperCase(),
+      type: 'MARKET',
+      quoteOrderQty: amount
+    }
+    const binanceSignatureTimestamp = SignatureAndTimestampBinance(params)
+    const {data : binanceResponse, status } = await ApiCall({
+      base: exchange.api_url,
+      path: '/api/v3/order',
+      api_key: exchange.api_key,
+      params: {
+        ...params,
+        signature: binanceSignatureTimestamp.signature,
+        timestamp: binanceSignatureTimestamp.timestamp.toString()
+      },
+      method: 'post'
+    })
+    if(binanceResponse && status === 200){
+      await Order.create({
+        ...binanceResponse,
+        exchange: exchangeId,
+        user: userId
+      })
+      if(binanceResponse.status==='FILLED'){
+        transactionTowerbank(binanceResponse)
+      }
+      return binanceResponse;
+    }else{
+      throw new ApiError(httpStatus.BAD_REQUEST, binanceResponse?.message || 'New Order Error');
+    }
+  }
+}
+
+const syncOrders = async () => {
+  const orders = await Order.find({
+    status: { "$nin": ["FILLED", "CANCELED", "REJECTED", "EXPIRED"] }
+  });
+  const exchangeData = await Exchange.findOne({_id: orders.exchange})
+  for (const order of orders) {
+    const params = {
+      symbol: order.symbol,
+      orderId: parseInt(order.orderId)
+    }
+    const binanceSignatureTimestamp = SignatureAndTimestampBinance(params)
+    const {data : binanceResponse, status : binanceSwapStatus } = await ApiCall({
+      base: exchangeData.api_url,
+      path: '/api/v3/order',
+      params: {
+        ...params,
+        signature: binanceSignatureTimestamp.signature,
+        timestamp: binanceSignatureTimestamp.timestamp.toString()
+      },
+      method: 'get'
+    })
+    const orderUpdatetData = await Order.updateOne({orderId: order.orderId}, binanceResponse)
+    if(orderUpdatetData.status==='FILLED'){
+      transactionTowerbank(binanceResponse)
+    }
+  }
+}
+
+const transactionTowerbank = async (orderUpdatetData) => {
+  const userData = await User.findOne({_id: orderUpdatetData.user})
+      const towerbank_account_id = userData.towerbank_account_id
+      const {data : towerbankTrxResponse, status : towerbankTrxStatus } = await ApiCall({
+        base: TowerbankApi,
+        path: '/v1/transaction',
+        data: {
+          accountId: towerbank_account_id,
+          amount: parseFloat(orderUpdatetData.origQuoteOrderQty),
+          transactionType: orderUpdatetData.side === 'BUY' ? 'purchase' : orderUpdatetData.side === 'SELL' ? 'sale' : ''
+        },
+        method: 'post'
+      })
+      console.info(towerbankTrxResponse)
+}
 
 const quoteSwapRequest = async (exchangeId, pair, amount) => {
   const exchange = await Exchange.findOne({_id: exchangeId});
@@ -204,4 +285,6 @@ module.exports = {
   quoteSwapRequest,
   acceptQuoteAsset,
   syncSwapRequest,
+  newOrderTrade,
+  syncOrders
 };

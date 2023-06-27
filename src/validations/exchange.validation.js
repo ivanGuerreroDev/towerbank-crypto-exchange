@@ -9,7 +9,7 @@ const newOrder = {
     symbol: Joi.string().required(),
     side: Joi.string().required(),
     type: Joi.string().required(),
-    quoteOrderQty: Joi.string().number()
+    quoteOrderQty: Joi.number()
   }),
 }
 

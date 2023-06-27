@@ -1,4 +1,6 @@
 const axios = require('axios');
+
+const TowerbankApi = "https://towerbank.bankathontb.com/bankathon"
 const ApiCall = ({
   base,
   path,
@@ -31,4 +33,6 @@ const ApiCall = ({
   }
 
 }
+
+module.exports.TowerbankApi = TowerbankApi
 module.exports.ApiCall = ApiCall

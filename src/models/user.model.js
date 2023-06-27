@@ -44,6 +44,11 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    towerbank_account_id: {
+      type: String,
+      required: true,
+      unique: true
+    },
   },
   {
     timestamps: true,

@@ -11,12 +11,14 @@ router
   .get(exchangeController.getExchanges);
 
 router
-  .route('/priceByAssetAllExchanges/:coinId')
-  .get(exchangeController.getPriceByAssetAllExchanges);
+  .route('/:id')
+  .get(exchangeController.getExchangeById);
 
 router
-  .route('/quoteBuyAsset')
-  .post(validate(exchangeValidation.quoteBuyAsset), exchangeController.quoteBuyAsset);
+  .route('/priceByPairAllExchanges/:pair')
+  .get(exchangeController.getpriceByPairAllExchanges);
+
+
 
 module.exports = router;
 
@@ -55,20 +57,20 @@ module.exports = router;
 
 /**
  * @swagger
- * /exchange/priceByAssetAllExchanges/{coinId}:
+ * /exchange/{id}:
  *   get:
- *     summary: Get price by asset
- *     description: Get price by asset in all exchanges.
+ *     summary: Get exchange
+ *     description: Get exchange.
  *     tags: [Exchange]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: coinId
+ *         name: id
  *         required: true
  *         schema:
  *           type: string
- *         description: Asset id
+ *         description: Exchange id
  *     responses:
  *       "200":
  *         description: OK
@@ -84,33 +86,23 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  */
 
-
 /**
  * @swagger
- * /exchange/quoteBuyAsset/:
- *   post:
+ * /exchange/priceByPairAllExchanges/{pair}:
+ *   get:
  *     summary: Get price by asset
  *     description: Get price by asset in all exchanges.
  *     tags: [Exchange]
  *     security:
  *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - coinId
- *               - exchangeId
- *               - amount
- *             properties:
- *               coinId:
- *                 type: string
- *               exchangeId:
- *                 type: string
- *               amount:
- *                 type: number
+ *     parameters:
+ *       - in: path
+ *         name: pair
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description:
+ *           Pair assets: BTC/USDT
  *     responses:
  *       "200":
  *         description: OK

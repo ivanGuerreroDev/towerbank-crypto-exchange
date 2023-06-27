@@ -5,6 +5,7 @@ const docsRoute = require('./docs.route');
 const assetRoute = require('./asset.route');
 const exchangeRoute = require('./exchange.route');
 const subAccountRoute = require('./subAccount.route');
+const transactionRoute = require('./transaction.route');
 
 const config = require('../../config/config');
 
@@ -30,6 +31,8 @@ const defaultRoutes = [
   {
     path: '/subAccount',
     route: subAccountRoute,
+    path: '/transaction',
+    route: transactionRoute,
   },
 ];
 

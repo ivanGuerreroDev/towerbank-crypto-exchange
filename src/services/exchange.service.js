@@ -1,7 +1,14 @@
 const httpStatus = require('http-status');
-const { Exchange } = require('../models');
+const { Exchange, SwapRequest } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { ApiCall } = require('../utils/Api');
+const { Spot } = require('@binance/connector')
+const {SignatureAndTimestampBinance} = require('../utils/SignatureBinance')
+
+const apiKey = 'rNVAoZjKQorYjpnHQFRHn1Q30hdu5dAnRmLvuWl2VE1ml5BpYSrzEs0Lylpa9EN5'
+const apiSecret = 'YB33MhssrFmbAsEmcuWOoDQWT6F2upf3SXKbf4xDHBO2X2BUTfKLmk5sd8oKndxv'
+const client = new Spot(apiKey, apiSecret, { baseURL: 'https://testnet.binance.vision'})
+
 /**
  * getExchanges
  * @returns {Promise<Exchange>}
@@ -16,19 +23,13 @@ const getPriceByAssetAllExchanges = async (coinId) => {
   const prices = [];
 
   for (const exchange of exchanges) {
-    if(exchange["active"]){
-      if(exchange.name==="Binance"){
-        const {data : binanceResponse, status } = await ApiCall({
-          base: exchange.api_url,
-          path: '/api/v3/avgPrice',
-          params: {
-            symbol: coinId+'USDT'
-          },
-          method: 'get'
-        })
-        if(binanceResponse && status === 200) prices.push({
+    if(exchange?.active){
+      if(exchange?.api_url && exchange?.name==="Binance"){
+        const response = await client.avgPrice(coinId+'usdt')
+        if(response && response.status === 200) prices.push({
+          id: exchange._id,
           name: exchange.name,
-          price: binanceResponse.price
+          price: response.data.price
         })
       } else if(exchange.name==="Kraken"){
 
@@ -38,14 +39,68 @@ const getPriceByAssetAllExchanges = async (coinId) => {
 
       }
     }
-
   }
   return prices;
 };
+
+const quoteBuyAsset = async (exchangeId, coinId, amount) => {
+  const exchange = await Exchange.findOne({_id: exchangeId});
+  if(exchange?.name === "Binance"){
+    const params = {
+      fromAsset: 'USDT',
+      toAsset: coinId,
+      fromAmount: amount,
+      walletType: 'FUNDING'
+    }
+    const binanceSignatureTimestamp = SignatureAndTimestampBinance(params)
+    const {data : binanceResponse, status } = await ApiCall({
+      base: exchange.api_url,
+      path: '/sapi/v1/convert/getQuote',
+      api_key: exchange.api_key,
+      params: {
+        ...params,
+        signature: binanceSignatureTimestamp.signature,
+        timestamp: binanceSignatureTimestamp.timestamp
+      },
+      method: 'post'
+    })
+    if(binanceResponse && status === 200){
+      return binanceResponse;
+    }
+  }
+};
+
+const acceptQuoteBuyAsset = async (exchangeId, quoteId) => {
+  const exchange = await Exchange.findOne({_id: exchangeId});
+  if(exchange?.name === "Binance"){
+    const {data : binanceResponse, status } = await ApiCall({
+      base: exchange.api_url,
+      path: '/sapi/v1/convert/acceptQuote',
+      params: {
+        quoteId: quoteId
+      },
+      method: 'post'
+    })
+    if(binanceResponse && status === 200){
+      await SwapRequest.create({
+        "orderId": binanceResponse.orderId,
+        "createTime":binanceResponse.createTime,
+        "orderStatus":binanceResponse.orderStatus //PROCESS/ACCEPT_SUCCESS/SUCCESS/FAIL
+      })
+      return binanceResponse;
+    }
+  }
+};
+
+const onQuoteBuyAssetIsCompleted = async (orderId) => {
+
+}
 
 
 
 module.exports = {
   getExchanges,
-  getPriceByAssetAllExchanges
+  getPriceByAssetAllExchanges,
+  quoteBuyAsset,
+  acceptQuoteBuyAsset
 };

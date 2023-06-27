@@ -1,22 +1,18 @@
 const mongoose = require('mongoose');
 const { toJSON } = require('./plugins');
 
-const exchangeSchema = mongoose.Schema(
+const swapRequestSchema = mongoose.Schema(
   {
-    name: {
+    orderId: {
       type: String,
       required: true
     },
-    api_key: {
-      type: String,
+    createTime: {
+      type: Number,
       required: true,
     },
-    api_url: {
+    orderStatus: {
       type: String,
-      required: true,
-    },
-    active: {
-      type: Boolean,
       required: true,
     },
   },
@@ -26,11 +22,11 @@ const exchangeSchema = mongoose.Schema(
 );
 
 // add plugin that converts mongoose to json
-exchangeSchema.plugin(toJSON);
+swapRequestSchema.plugin(toJSON);
 
 /**
  * @typedef Exchange
  */
-const Exchange = mongoose.model('Exchange', exchangeSchema);
+const SwapRequest = mongoose.model('SwapRequest', swapRequestSchema);
 
-module.exports = Exchange;
+module.exports = SwapRequest;

@@ -14,8 +14,16 @@ const getPriceByAssetAllExchanges = catchAsync(async (req, res) => {
   res.status(httpStatus.ACCEPTED).send(prices);
 });
 
+const quoteBuyAsset = catchAsync(async (req, res) => {
+  const { coinId, exchangeId, amount } = req.body
+  const prices = await exchangeService.quoteBuyAsset(exchangeId, coinId, amount);
+  res.status(httpStatus.ACCEPTED).send(prices);
+});
+
+
 
 module.exports = {
   getExchanges,
-  getPriceByAssetAllExchanges
+  getPriceByAssetAllExchanges,
+  quoteBuyAsset
 };

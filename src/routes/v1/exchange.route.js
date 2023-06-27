@@ -13,6 +13,11 @@ router
 router
   .route('/priceByAssetAllExchanges/:coinId')
   .get(exchangeController.getPriceByAssetAllExchanges);
+
+router
+  .route('/quoteBuyAsset')
+  .post(validate(exchangeValidation.quoteBuyAsset), exchangeController.quoteBuyAsset);
+
 module.exports = router;
 
 
@@ -47,6 +52,7 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  */
 
+
 /**
  * @swagger
  * /exchange/priceByAssetAllExchanges/{coinId}:
@@ -63,6 +69,48 @@ module.exports = router;
  *         schema:
  *           type: string
  *         description: Asset id
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *                $ref: '#/components/schemas/Exchange'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         $ref: '#/components/responses/NotFound'
+ */
+
+
+/**
+ * @swagger
+ * /exchange/quoteBuyAsset/:
+ *   post:
+ *     summary: Get price by asset
+ *     description: Get price by asset in all exchanges.
+ *     tags: [Exchange]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - coinId
+ *               - exchangeId
+ *               - amount
+ *             properties:
+ *               coinId:
+ *                 type: string
+ *               exchangeId:
+ *                 type: string
+ *               amount:
+ *                 type: number
  *     responses:
  *       "200":
  *         description: OK

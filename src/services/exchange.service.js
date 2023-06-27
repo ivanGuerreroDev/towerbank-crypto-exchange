@@ -18,6 +18,12 @@ const getExchanges = async () => {
   return exchange;
 };
 
+const getExchangeById = async (id) => {
+  const exchange = await Exchange.findOne({ _id: id });
+  return exchange;
+};
+
+
 const getPriceByAssetAllExchanges = async (coinId) => {
   const exchanges = await Exchange.find();
   const prices = [];
@@ -129,15 +135,29 @@ const acceptQuoteBuyAsset = async (exchangeId, quoteId) => {
   }
 };
 
-const onQuoteBuyAssetIsCompleted = async (orderId) => {
-
+const syncSwapRequest = async (orderId) => {
+  const swapRequests = await SwapRequest.findOne({orderId: orderId, status: "PROCESS"});
+  const {data : binanceResponse, status } = await ApiCall({
+    base: swapRequests.exchange.api_url,
+    path: '/sapi/v1/convert/orderId',
+    params: {
+      orderId: orderId
+    },
+    method: 'get'
+  })
+  if(binanceResponse && status === 200){
+    await SwapRequest.updateOne({orderId: orderId}, binanceResponse)
+    return binanceResponse;
+  }
 }
 
 
 
 module.exports = {
   getExchanges,
+  getExchangeById,
   getPriceByAssetAllExchanges,
   quoteBuyAsset,
-  acceptQuoteBuyAsset
+  acceptQuoteBuyAsset,
+  syncSwapRequest
 };

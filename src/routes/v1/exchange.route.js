@@ -11,12 +11,14 @@ router
   .get(exchangeController.getExchanges);
 
 router
+  .route('/:id')
+  .get(exchangeController.getExchangeById);
+
+router
   .route('/priceByAssetAllExchanges/:coinId')
   .get(exchangeController.getPriceByAssetAllExchanges);
 
-router
-  .route('/quoteBuyAsset')
-  .post(validate(exchangeValidation.quoteBuyAsset), exchangeController.quoteBuyAsset);
+
 
 module.exports = router;
 
@@ -52,6 +54,44 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  */
 
+
+/**
+ * @swagger
+ * tags:
+ *   name: Exchange
+ *   description: Exchange
+ */
+
+/**
+ * @swagger
+ * /exchange/{id}:
+ *   get:
+ *     summary: Get exchange
+ *     description: Get exchange.
+ *     tags: [Exchange]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Exchange id
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *                $ref: '#/components/schemas/Exchange'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         $ref: '#/components/responses/NotFound'
+ */
 
 /**
  * @swagger

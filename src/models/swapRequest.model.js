@@ -15,6 +15,29 @@ const swapRequestSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    fromAsset: {
+      type: String
+    },
+    fromAmount: {
+      type: String
+    },
+    toAsset: {
+      type: String
+    },
+    toAmount: {
+      type: String
+    },
+    ratio: {
+      type: String
+    },
+    inverseRatio: {
+      type: String
+    },
+    exchange: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'Exchange',
+      required: true,
+    }
   },
   {
     timestamps: true,

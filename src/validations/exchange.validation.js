@@ -10,7 +10,22 @@ const quoteBuyAsset = {
     amount: Joi.number().required()
   }),
 }
+
+const acceptQuoteBuyAsset = {
+  body: Joi.object().keys({
+    quoteId: Joi.string().required()
+  }),
+}
+
+const syncSwapRequest = {
+  body: Joi.object().keys({
+    orderId: Joi.string().required()
+  }),
+}
+
 module.exports = {
   getExhanges,
-  quoteBuyAsset
+  quoteBuyAsset,
+  acceptQuoteBuyAsset,
+  syncSwapRequest
 };

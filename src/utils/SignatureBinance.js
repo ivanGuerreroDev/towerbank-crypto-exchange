@@ -1,24 +1,54 @@
-const base64 = require('base64-js');
-const crypto = require('crypto');
+const dotenv = require('dotenv');
 const path = require('path');
+dotenv.config({ path: path.join(__dirname, '../../.env') });
+const envVars = process.env;
+const hmacSHA256 = require('crypto-js/hmac-sha256');
+
+function is_disabled(str) {
+  return str == true;
+}
+
+function is_empty(str) {
+  if (typeof str == 'undefined' ||
+      !str ||
+      str.length === 0 ||
+      str === "" ||
+      !/[^\s]/.test(str) ||
+      /^\s*$/.test(str) ||
+      str.replace(/\s/g,"") === "")
+  {
+      return true;
+  }
+  else
+  {
+      return false;
+  }
+}
 
 const SignatureAndTimestampBinance = (params) => {
-  const PRIVATE_KEY_PATH = path.join(__dirname, '..', 'certs', 'test-prv-key.pem');
-  const fs = require('fs');
-  const privateKeyPem = fs.readFileSync(PRIVATE_KEY_PATH, 'utf8');
-  const privateKey = crypto.createPrivateKey(privateKeyPem);
 
-  // Timestamp the request
-  const timestamp = Date.now();
+  const ts = Date.now();
+  let paramsObject = {};
+  const binance_api_secret = envVars.BINANCE_API_SECRET;
+  const parameters = Object.keys(params).map((key) => ({key, value: params[key].toString()}));
 
-  // Sign the request
-  const payload = Object.entries(params)
-    .map(([param, value]) => `${param}=${value}`)
-    .join('&');
-  const sign = crypto.createSign('RSA-SHA256');
-  sign.update(payload, 'ascii');
-  const signature = base64.fromByteArray(sign.sign(privateKey, 'base64'));
-  return ({ signature, timestamp })
+  parameters.map((param) => {
+    if (param.key != 'signature' &&
+      !is_empty(param.value) &&
+      !is_disabled(param.disabled)) {
+      paramsObject[param.key] = param.value;
+    }
+  })
+  let signature = ''
+  if (binance_api_secret) {
+    const queryString = Object.keys(paramsObject).map((key) => {
+      return `${key}=${paramsObject[key]}`;
+    }).join('&');
+    console.log(queryString);
+    signature = hmacSHA256(queryString, binance_api_secret).toString();
+  }
+
+  return ({ signature: signature, timestamp: ts })
 }
 
 

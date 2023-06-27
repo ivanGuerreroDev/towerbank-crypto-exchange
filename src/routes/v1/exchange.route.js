@@ -101,7 +101,8 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: Pair assets: BTC/USDT
+ *         description:
+ *           Pair assets: BTC/USDT
  *     responses:
  *       "200":
  *         description: OK

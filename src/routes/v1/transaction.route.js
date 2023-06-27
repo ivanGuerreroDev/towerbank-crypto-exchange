@@ -53,6 +53,10 @@ module.exports = router;
  *                 type: string
  *               amount:
  *                 type: number
+ *             example:
+ *               pair: BTC/USDT
+ *               exchangeId: asasasas
+ *               amount: 1222.32
  *     responses:
  *       "200":
  *         description: OK

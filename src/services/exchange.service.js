@@ -93,7 +93,7 @@ const quoteSwapRequest = async (exchangeId, pair, amount) => {
     const params = {
       fromAsset: pairArr[1],
       toAsset: pairArr[0],
-      fromAmount: amount,
+      fromAmount: amount.toString(),
       walletType: 'FUNDING'
     }
     const binanceSignatureTimestamp = SignatureAndTimestampBinance(params)
@@ -101,10 +101,10 @@ const quoteSwapRequest = async (exchangeId, pair, amount) => {
       base: exchange.api_url,
       path: '/sapi/v1/convert/getQuote',
       api_key: exchange.api_key,
-      data: {
+      params: {
         ...params,
         signature: binanceSignatureTimestamp.signature,
-        timestamp: binanceSignatureTimestamp.timestamp
+        timestamp: binanceSignatureTimestamp.timestamp.toString()
       },
       method: 'post'
     })
@@ -117,11 +117,20 @@ const quoteSwapRequest = async (exchangeId, pair, amount) => {
 const acceptQuoteAsset = async (userId, exchangeId, quoteId) => {
   const exchange = await Exchange.findOne({_id: exchangeId});
   if(exchange?.name === "Binance"){
+    // asset from sub account to master account
+
+    // Accept swap of pair
+    const params = {
+      quoteId: quoteId
+    }
+    const binanceSignatureTimestamp = SignatureAndTimestampBinance(params)
     const {data : binanceResponse, status } = await ApiCall({
       base: exchange.api_url,
       path: '/sapi/v1/convert/acceptQuote',
-      data: {
-        quoteId: quoteId
+      params: {
+        ...params,
+        signature: binanceSignatureTimestamp.signature,
+        timestamp: binanceSignatureTimestamp.timestamp.toString()
       },
       method: 'post'
     })
@@ -139,11 +148,17 @@ const acceptQuoteAsset = async (userId, exchangeId, quoteId) => {
 
 const syncSwapRequest = async (orderId) => {
   const swapRequests = await SwapRequest.findOne({orderId: orderId, status: "PROCESS"});
+  const params = {
+    orderId: orderId
+  }
+  const binanceSignatureTimestamp = SignatureAndTimestampBinance(params)
   const {data : binanceResponse, status : binanceSwapStatus } = await ApiCall({
     base: swapRequests.exchange.api_url,
     path: '/sapi/v1/convert/orderId',
-    data: {
-      orderId: orderId
+    params: {
+      ...params,
+      signature: binanceSignatureTimestamp.signature,
+      timestamp: binanceSignatureTimestamp.timestamp.toString()
     },
     method: 'post'
   })

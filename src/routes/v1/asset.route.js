@@ -27,7 +27,7 @@ module.exports = router;
  *   get:
  *     summary: Get all crypto assets
  *     description: Get all crypto assets.
- *     tags: [Assets]
+ *     tags: [Asset]
  *     security:
  *       - bearerAuth: []
  *     responses:

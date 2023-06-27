@@ -4,6 +4,7 @@ const userRoute = require('./user.route');
 const docsRoute = require('./docs.route');
 const assetRoute = require('./asset.route');
 const exchangeRoute = require('./exchange.route');
+const transactionRoute = require('./transaction.route');
 
 const config = require('../../config/config');
 
@@ -25,6 +26,10 @@ const defaultRoutes = [
   {
     path: '/exchange',
     route: exchangeRoute,
+  },
+  {
+    path: '/transaction',
+    route: transactionRoute,
   },
 ];
 

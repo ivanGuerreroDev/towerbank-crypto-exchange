@@ -21,7 +21,7 @@ const getpriceByPairAllExchanges = catchAsync(async (req, res) => {
 });
 
 const newOrder = catchAsync(async (req, res) => {
-  const { userId, exchangeId, symbol, amount, side } = req.params
+  const { userId, exchangeId, symbol, amount, side } = req.body
   const order = await exchangeService.newOrderTrade(userId, exchangeId, symbol, amount, side);
   res.status(httpStatus.ACCEPTED).send(order);
 });

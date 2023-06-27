@@ -30,6 +30,7 @@ const SignatureAndTimestampBinance = (params) => {
   const ts = Date.now();
   let paramsObject = {};
   const binance_api_secret = envVars.BINANCE_API_SECRET;
+  params.timestamp = ts;
   const parameters = Object.keys(params).map((key) => ({key, value: params[key].toString()}));
 
   parameters.map((param) => {

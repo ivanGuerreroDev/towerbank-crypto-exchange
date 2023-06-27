@@ -33,7 +33,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /transaction/newOrderTrade/:
+ * /transaction/newOrder/:
  *   post:
  *     summary: Create new order trade
  *     description: Create new order trade.

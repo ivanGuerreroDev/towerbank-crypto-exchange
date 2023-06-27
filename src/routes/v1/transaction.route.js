@@ -47,18 +47,21 @@ module.exports = router;
  *           schema:
  *             type: object
  *             required:
+ *               - userId
+ *               - exchangeId
  *               - symbol
  *               - side
- *               - type
- *               - quoteOrderQty
+ *               - amount
  *             properties:
+ *               userId:
+ *                 type: string
+ *               exchangeId:
+ *                 type: string
  *               symbol:
  *                 type: string
  *               side:
  *                 type: string
- *               type:
- *                 type: string
- *               quoteOrderQty:
+ *               amount:
  *                 type: number
  *     responses:
  *       "200":

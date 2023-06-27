@@ -6,10 +6,11 @@ const getExhanges = {
 
 const newOrder = {
   body: Joi.object().keys({
+    userId: Joi.string().required(),
+    exchangeId: Joi.string().required(),
     symbol: Joi.string().required(),
-    side: Joi.string().required(),
-    type: Joi.string().required(),
-    quoteOrderQty: Joi.number()
+    amount: Joi.number(),
+    side: Joi.string().required()
   }),
 }
 

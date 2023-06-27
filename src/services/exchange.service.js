@@ -133,11 +133,10 @@ const onQuoteBuyAssetIsCompleted = async (orderId) => {
 
 }
 
-
-
 module.exports = {
   getExchanges,
   getPriceByAssetAllExchanges,
   quoteBuyAsset,
-  acceptQuoteBuyAsset
+  acceptQuoteBuyAsset,
+  addSubAccount
 };

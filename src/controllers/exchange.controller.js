@@ -20,8 +20,6 @@ const quoteBuyAsset = catchAsync(async (req, res) => {
   res.status(httpStatus.ACCEPTED).send(prices);
 });
 
-
-
 module.exports = {
   getExchanges,
   getPriceByAssetAllExchanges,

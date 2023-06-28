@@ -7,17 +7,13 @@ const {SignatureAndTimestampBinance} = require('../utils/SignatureBinance')
 
 const postTransferToSubAccount = async (exchangeId, toEmail, asset, amount) => {
   const exchange = await Exchange.findOne({ _id: exchangeId });
-
   const { toEmail, asset, amount } = req.body;
-
   const params = {
     toEmail,
     asset,
     amount
   };
-
   const binanceSignatureTimestamp = SignatureAndTimestampBinance(params)
-
   const { data: binanceResponse, status } = await ApiCall({
     base: exchange.api_url,
     path: '/sapi/v1/sub-account/transfer/subToMaster',

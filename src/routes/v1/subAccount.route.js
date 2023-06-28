@@ -38,7 +38,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /subAccount/getAllSubAccounts/{userId}
+ * /subAccount/getAllSubAccounts/{userId}:
  *   get:
  *     summary: Get all sub account by user
  *     description: Get all sub account by user.
@@ -70,7 +70,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /subAccount/getSubAccountsByAccountId/{accountId}
+ * /subAccount/getSubAccountsByAccountId/{accountId}:
  *   get:
  *     summary: Get all sub account by Account Id
  *     description: Get all sub account by Account Id.
@@ -101,7 +101,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /subAccount/getSubAccountById/{subAccountId}
+ * /subAccount/getSubAccountById/{subAccountId}:
  *   get:
  *     summary: Get all sub account by Sub Account Id
  *     description: Get all sub account by Sub Account Id.
@@ -132,7 +132,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /subAccount/addSubAccount/{userId}
+ * /subAccount/addSubAccount/{userId}:
  *   post:
  *     summary: Create the sub account by user Id
  *     description: Create the sub account by user Id.

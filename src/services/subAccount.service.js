@@ -4,7 +4,7 @@ const ApiError = require('../utils/ApiError');
 const { ApiCall } = require('../utils/Api');
 const { Spot } = require('@binance/connector')
 const {SignatureAndTimestampBinance} = require('../utils/SignatureBinance')
-import { guiid as uuidv6 } from 'uuid';
+const { uuidv6: guiid } = require('uuid');
 
 const getAllSubAccounts = async (userId) => {
   const AllSubAccounts = await SubAccount.filter({_userId: userId});

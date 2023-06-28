@@ -11,7 +11,14 @@ const postTransferToSubAccount =  catchAsync(async (req, res) => {
   res.status(httpStatus.ACCEPTED).send(tranferenciaId);
 });
 
+const postTransferToAccount =  catchAsync(async (req, res) => {
+  const { exchangeId, asset, amount} = req.body
+  const tranferenciaId = await transferenciaService.postTransferToAccount(exchangeId, asset, amount);
+  res.status(httpStatus.ACCEPTED).send(tranferenciaId);
+});
+
 
 module.exports = {
-  postTransferToSubAccount
+  postTransferToSubAccount,
+  postTransferToAccount
 };

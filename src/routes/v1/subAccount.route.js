@@ -13,15 +13,11 @@ router
   .post(validate(subAccountValidation.getAllSubAccounts), subAccountController.getAllSubAccounts);
 
 router
-  .route('/getSubAccountsByAccountId/:accountId')
-  .post(validate(subAccountValidation.getSubAccountsByAccountId), subAccountController.getSubAccountsByAccountId);
-
-router
   .route('/getSubAccountById/:subAccountId')
   .post(validate(subAccountValidation.getSubAccountById), subAccountController.getSubAccountById);
 
 router
-  .route('/addSubAccount/:userId')
+  .route('/addSubAccount')
   .post(validate(subAccountValidation.addSubAccount), subAccountController.addSubAccount);
 
 
@@ -32,7 +28,7 @@ module.exports = router;
 /**
  * @swagger
  * tags:
- *   name: SubAccount
+ *   name: subAccount
  *   description: Sub Account Users
  */
 
@@ -70,37 +66,6 @@ module.exports = router;
 
 /**
  * @swagger
- * /subAccount/getSubAccountsByAccountId/{accountId}:
- *   get:
- *     summary: Get all sub account by Account Id
- *     description: Get all sub account by Account Id.
- *     tags: [SubAccount]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: accountId
- *         required: true
- *         schema:
- *           type: string
- *         description: Account id
- *     responses:
- *       "200":
- *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *                $ref: '#/components/schemas/SubAccount'
- *       "401":
- *         $ref: '#/components/responses/Unauthorized'
- *       "403":
- *         $ref: '#/components/responses/Forbidden'
- *       "404":
- *         $ref: '#/components/responses/NotFound'
- */
-
-/**
- * @swagger
  * /subAccount/getSubAccountById/{subAccountId}:
  *   get:
  *     summary: Get all sub account by Sub Account Id
@@ -132,20 +97,27 @@ module.exports = router;
 
 /**
  * @swagger
- * /subAccount/addSubAccount/{userId}:
+ * /subAccount/addSubAccount/:
  *   post:
  *     summary: Create the sub account by user Id
  *     description: Create the sub account by user Id.
  *     tags: [SubAccount]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: User id
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *               - subAccountString
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               subAccountString:
+ *                 type: string
  *     responses:
  *       "200":
  *         description: OK

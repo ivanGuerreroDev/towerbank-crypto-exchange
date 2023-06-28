@@ -7,14 +7,14 @@ const { subAccountService } = require('../services');
 
 
 const getAllSubAccounts =  catchAsync(async (req, res) => {
-  const { userId } = req.body
+  const { userId } = req.params
   const subAccounts = await subAccountService.getAllSubAccounts(userId);
   res.status(httpStatus.ACCEPTED).send(subAccounts);
 });
 
 const getSubAccountsByAccountId =  catchAsync(async (req, res) => {
-  const {AccountId} = req.body
-  const subAccountsByAccount = await subAccountService.getSubAccountByAccountId(AccountId);
+  const {subAccountId} = req.params
+  const subAccountsByAccount = await subAccountService.getSubAccountById(subAccountId);
   res.status(httpStatus.ACCEPTED).send(subAccountsByAccount);
 });
 
@@ -25,8 +25,8 @@ const getSubAccountById =  catchAsync(async (req, res) => {
 });
 
 const addSubAccount =  catchAsync(async (req, res) => {
-  const { userId } = req.body
-  const subAccounts = await subAccountService.addSubAccount(userId);
+  const { userId, subAccountString } = req.body
+  const subAccounts = await subAccountService.addSubAccount(userId, subAccountString);
   res.status(httpStatus.ACCEPTED).send(subAccounts);
 });
 

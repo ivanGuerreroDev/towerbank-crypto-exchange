@@ -5,7 +5,7 @@ const { authService, userService, tokenService, emailService , subAccountService
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
   const tokens = await tokenService.generateAuthTokens(user);
-  const subAccounts = await subAccountService.addSubAccount(user.id);
+  const subAccounts = await subAccountService.addSubAccount(user.id, user.id);
   res.status(httpStatus.CREATED).send({ user, tokens , subAccounts});
 });
 

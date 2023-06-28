@@ -4,18 +4,16 @@ const { toJSON } = require('./plugins');
 const subAccountSchema = mongoose.Schema(
   {
     user_id: {
-      type: String,
-      required: true
-    },
-    sub_account_id: {
-      type: String,
-      required: true,
-    },
-    account_id: {
-      type: String,
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'User',
       required: true,
     },
     exchange_id: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'Exchange',
+      required: true,
+    },
+    email: {
       type: String,
       required: true,
     },

@@ -31,6 +31,8 @@ const defaultRoutes = [
   {
     path: '/subAccount',
     route: subAccountRoute,
+  },
+  {
     path: '/transaction',
     route: transactionRoute,
   },

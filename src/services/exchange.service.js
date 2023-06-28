@@ -299,10 +299,6 @@ const syncSwapRequest = async (orderId) => {
 
 module.exports = {
   getExchanges,
-  getPriceByAssetAllExchanges,
-  quoteBuyAsset,
-  acceptQuoteBuyAsset,
-  addSubAccount,
   getExchangeById,
   getpriceByPairAllExchanges,
   quoteSwapRequest,

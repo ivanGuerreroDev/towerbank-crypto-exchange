@@ -7,6 +7,10 @@ const exchangeSchema = mongoose.Schema(
       type: String,
       required: true
     },
+    logo: {
+      type: String,
+      required: true
+    },
     api_key: {
       type: String,
       required: true,

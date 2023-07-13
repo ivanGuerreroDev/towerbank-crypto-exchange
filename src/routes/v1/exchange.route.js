@@ -15,7 +15,7 @@ router
   .get(exchangeController.getExchangeById);
 
 router
-  .route('/priceByPairAllExchanges/:pair')
+  .route('/priceByPairAllExchanges')
   .get(exchangeController.getpriceByPairAllExchanges);
 
 
@@ -88,7 +88,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /exchange/priceByPairAllExchanges/{pair}:
+ * /exchange/priceByPairAllExchanges:
  *   get:
  *     summary: Get price by asset
  *     description: Get price by asset in all exchanges.
@@ -96,7 +96,7 @@ module.exports = router;
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
+ *       - in: query
  *         name: pair
  *         required: true
  *         schema:

@@ -15,7 +15,7 @@ const getExchangeById = catchAsync(async (req, res) => {
 });
 
 const getpriceByPairAllExchanges = catchAsync(async (req, res) => {
-  const { pair } = req.params
+  const { pair } = req.query
   const prices = await exchangeService.getpriceByPairAllExchanges(pair);
   res.status(httpStatus.ACCEPTED).send(prices);
 });

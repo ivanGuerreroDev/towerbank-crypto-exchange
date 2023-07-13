@@ -3,6 +3,7 @@ const { toJSON } = require('./plugins');
 
 const exchangeSchema = mongoose.Schema(
   {
+    _id: mongoose.ObjectId,
     name: {
       type: String,
       required: true

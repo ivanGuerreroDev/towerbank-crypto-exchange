@@ -4,6 +4,7 @@ const { tokenTypes } = require('../config/tokens');
 
 const tokenSchema = mongoose.Schema(
   {
+    _id: mongoose.ObjectId,
     token: {
       type: String,
       required: true,

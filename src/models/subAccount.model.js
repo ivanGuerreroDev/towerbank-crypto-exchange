@@ -3,6 +3,7 @@ const { toJSON } = require('./plugins');
 
 const subAccountSchema = mongoose.Schema(
   {
+    _id: mongoose.ObjectId,
     user_id: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'User',

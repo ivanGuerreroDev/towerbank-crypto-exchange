@@ -3,6 +3,7 @@ const { toJSON } = require('./plugins');
 
 const orderSchema = mongoose.Schema(
   {
+    _id: mongoose.ObjectId,
     symbol: {
       type: String,
       required: true

@@ -6,6 +6,7 @@ const { roles } = require('../config/roles');
 
 const userSchema = mongoose.Schema(
   {
+    _id: mongoose.ObjectId,
     name: {
       type: String,
       required: true,
@@ -66,7 +67,7 @@ userSchema.plugin(paginate);
  * @returns {Promise<boolean>}
  */
 userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
-  const user = await this.findOne({ email, _id: { $ne: excludeUserId } });
+  const user = await this.findOne({ email, _id: { $ne: new mongoose.Types.ObjectId(excludeUserId.trim()) } });
   return !!user;
 };
 

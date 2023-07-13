@@ -4,9 +4,10 @@ const ApiError = require('../utils/ApiError');
 const { ApiCall } = require('../utils/Api');
 const { Spot } = require('@binance/connector')
 const {SignatureAndTimestampBinance} = require('../utils/SignatureBinance')
+const mongoose = require('mongoose');
 
 const postTransferToSubAccount = async (exchangeId, toEmail, asset, amount) => {
-  const exchange = await Exchange.findOne({ _id: exchangeId });
+  const exchange = await Exchange.findById(exchangeId);
   const { toEmail, asset, amount } = req.body;
   const params = {
     toEmail,
@@ -31,7 +32,7 @@ const postTransferToSubAccount = async (exchangeId, toEmail, asset, amount) => {
 }
 
 const postTransferToAccount = async (exchangeId, asset, amount) => {
-  const exchange = await Exchange.findOne({ _id: exchangeId });
+  const exchange = await Exchange.findById(exchangeId);
   const { toEmail, asset, amount } = req.body;
   const params = {
     asset,

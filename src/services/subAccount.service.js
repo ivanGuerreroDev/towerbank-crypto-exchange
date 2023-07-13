@@ -5,6 +5,7 @@ const { ApiCall } = require('../utils/Api');
 const { Spot } = require('@binance/connector')
 const { SignatureAndTimestampBinance } = require('../utils/SignatureBinance')
 const { uuidv6: guiid } = require('uuid');
+const mongoose = require('mongoose');
 
 const getAllSubAccounts = async (userId) => {
   const AllSubAccounts = await SubAccount.filter({ user_id: userId });
@@ -12,7 +13,7 @@ const getAllSubAccounts = async (userId) => {
 };
 
 const getSubAccountById = async (subAccountId) => {
-  const exchange = await Exchange.filter({ _id: subAccountId });
+  const exchange = await Exchange.findById(v);
   return exchange;
 };
 

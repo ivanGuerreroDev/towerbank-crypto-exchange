@@ -7,6 +7,7 @@ const { SignatureAndTimestampBinance } = require('../utils/SignatureBinance')
 const apiKey = '3y3J5plnNMBF9T87bZIox9EqJLhnHeI8f6tjTxaSlPK4Ov0eWSTh35joNMsqIT4L'
 const apiSecret = 'oIOV9vFZds2HdYCvNRn2bcAbr09QARellcHomH2KuMkhYpLSmQbuQWK6FfPu1K4W'
 const client = new Spot(apiKey, apiSecret, { baseURL: 'https://testnet.binance.vision' })
+const mongoose  = require('mongoose');
 
 const getExchanges = async () => {
   const exchange = await Exchange.find();
@@ -14,68 +15,65 @@ const getExchanges = async () => {
 };
 
 const getExchangeById = async (id) => {
-  const exchange = await Exchange.findOne({ _id: id });
+  const exchange = await Exchange.findById(new mongoose.Types.ObjectId(id.trim()));
   return exchange;
 };
 
 
 const getpriceByPairAllExchanges = async (pair) => {
-  const exchanges = await Exchange.find();
+  const exchanges = await Exchange.find({ active: true });
   const prices = [];
-
   for (const exchange of exchanges) {
-    if (exchange?.active) {
-      const pairArr = pair.split("/");
-      if (exchange?.api_url && exchange?.name === "Binance") {
-        const response = await client.avgPrice(pairArr[0] + pairArr[1])
-        if (response && response.status === 200) prices.push({
+    const pairArr = pair.split("/");
+    if (exchange?.api_url && exchange?.name === "Binance") {
+      const response = await client.avgPrice(pairArr[1].toUpperCase() + pairArr[0].toUpperCase())
+      if (response && response.status === 200) prices.push({
+        id: exchange._id,
+        name: exchange.name,
+        price: response.data.price
+      })
+    } else if (exchange.name === "Kraken") {
+      const { data: krakenResponse, status } = await ApiCall({
+        base: exchange.api_url,
+        path: '/0/public/Ticker',
+        method: 'get',
+        params: {
+          pair: pairArr[0] + pairArr[1]
+        }
+      })
+      if (krakenResponse && status === 200) {
+        prices.push({
           id: exchange._id,
           name: exchange.name,
-          price: response.data.price
-        })
-      } else if (exchange.name === "Kraken") {
-        const { data: krakenResponse, status } = await ApiCall({
-          base: exchange.api_url,
-          path: '/0/public/Ticker',
-          method: 'get',
-          params: {
-            pair: pairArr[0] + pairArr[1]
-          }
-        })
-        if (krakenResponse && status === 200) {
-          prices.push({
-            id: exchange._id,
-            name: exchange.name,
-            price: krakenResponse.result[Object.keys(krakenResponse.result)[0]].a[0]
-          }
-          )
+          price: krakenResponse.result[Object.keys(krakenResponse.result)[0]].a[0]
         }
-      } else if (exchange.name === "Buda") {
-        const { data: budaResponse, status } = await ApiCall({
-          base: exchange.api_url,
-          path: '/markets/' + pairArr[0] + '-' + pairArr[1] + '/ticker',
-          method: 'get'
+        )
+      }
+    } else if (exchange.name === "Buda") {
+      const { data: budaResponse, status } = await ApiCall({
+        base: exchange.api_url,
+        path: '/markets/' + pairArr[0] + '-' + pairArr[1] + '/ticker',
+        method: 'get'
+      })
+      if (budaResponse && status === 200) {
+        prices.push({
+          id: exchange._id,
+          name: exchange.name,
+          price: budaResponse.last_price[0]
         })
-        if (budaResponse && status === 200) {
-          prices.push({
-            id: exchange._id,
-            name: exchange.name,
-            price: budaResponse.last_price[0]
-          })
-        }
-      } else if (exchange.name === "Bitstamp") {
-        const { data: bitstampResponse, status } = await ApiCall({
-          base: exchange.api_url,
-          path: '/ticker/' + pairArr[0] + pairArr[1],
-          method: 'get'
+      }
+    } else if (exchange.name === "Bitstamp") {
+      const { data: bitstampResponse, status } = await ApiCall({
+        base: exchange.api_url,
+        path: '/ticker/' + pairArr[0] + pairArr[1],
+        method: 'get'
+      })
+      if (bitstampResponse && status === 200) {
+        prices.push({
+          id: exchange._id,
+          name: exchange.name,
+          price: bitstampResponse.ask
         })
-        if (bitstampResponse && status === 200) {
-          prices.push({
-            id: exchange._id,
-            name: exchange.name,
-            price: bitstampResponse.ask
-          })
-        }
       }
     }
   }
@@ -83,7 +81,7 @@ const getpriceByPairAllExchanges = async (pair) => {
 };
 
 const newOrderTrade = async (userId, exchangeId, symbol, amount, side) => {
-  const exchange = await Exchange.findOne({ _id: exchangeId });
+  const exchange = await Exchange.findById(new mongoose.Types.ObjectId(exchangeId.trim()));
   if (validateBalanceForTrx(userId, amount)) {
     if (exchange?.name === "Binance") {
       let params = {
@@ -129,7 +127,7 @@ const syncOrders = async () => {
   const orders = await Order.find({
     status: { "$nin": ["FILLED", "CANCELED", "REJECTED", "EXPIRED"] }
   });
-  const exchangeData = await Exchange.findOne({ _id: orders.exchange })
+  const exchangeData = await Exchange.findById(orders.exchange)
   for (const order of orders) {
     if (validateBalanceForTrx(order.user, order.cummulativeQuoteQty)) {
       const params = {
@@ -156,7 +154,7 @@ const syncOrders = async () => {
 }
 
 const validateBalanceForTrx = async (userId, amount) => {
-  const userData = await User.findOne({ _id: userId })
+  const userData = await User.findById(userId)
   const { data: towerbankUserInfoResponse, status: towerbankTrxStatus } = await ApiCall({
     base: TowerbankApi,
     path: '/v1/account',
@@ -170,7 +168,7 @@ const validateBalanceForTrx = async (userId, amount) => {
 }
 
 const transactionTowerbank = async (orderUpdatetData, userId) => {
-  const userData = await User.findOne({ _id: userId })
+  const userData = await User.findById(new mongoose.Types.ObjectId(userId.trim()))
   const { data: towerbankTrxResponse, status: towerbankTrxStatus } = await ApiCall({
     base: TowerbankApi,
     path: '/v1/transaction',
@@ -189,7 +187,7 @@ const transactionTowerbank = async (orderUpdatetData, userId) => {
 }
 
 const quoteSwapRequest = async (exchangeId, pair, amount) => {
-  const exchange = await Exchange.findOne({ _id: exchangeId });
+  const exchange = await Exchange.findById(new mongoose.Types.ObjectId(exchangeId.trim()));
   const pairArr = pair.split("/");
   if (exchange?.name === "Binance") {
     const params = {
@@ -217,7 +215,7 @@ const quoteSwapRequest = async (exchangeId, pair, amount) => {
 };
 
 const acceptQuoteAsset = async (userId, exchangeId, quoteId) => {
-  const exchange = await Exchange.findOne({ _id: exchangeId });
+  const exchange = await Exchange.findById(new mongoose.Types.ObjectId(exchangeId.trim()));
   if (exchange?.name === "Binance") {
     // asset from sub account to master account
 
@@ -249,7 +247,7 @@ const acceptQuoteAsset = async (userId, exchangeId, quoteId) => {
 };
 
 const syncSwapRequest = async (orderId) => {
-  const swapRequests = await SwapRequest.findOne({ orderId: orderId, status: "PROCESS" });
+  const swapRequests = await SwapRequest.findOne({ orderId: new mongoose.Types.ObjectId(orderId.trim()), status: "PROCESS" });
   const params = {
     orderId: orderId
   }
@@ -265,7 +263,7 @@ const syncSwapRequest = async (orderId) => {
     method: 'post'
   })
   const swapRequestData = await SwapRequest.updateOne({ orderId: orderId }, binanceResponse)
-  const userData = await User.findOne({ _id: swapRequestData.user })
+  const userData = await User.findById(swapRequestData.user)
   const towerbank_account_id = userData.towerbank_account_id
 
   let amount, transactionType

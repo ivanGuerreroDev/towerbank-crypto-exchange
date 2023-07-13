@@ -3,6 +3,7 @@ const { toJSON } = require('./plugins');
 
 const swapRequestSchema = mongoose.Schema(
   {
+    _id: mongoose.ObjectId,
     orderId: {
       type: String,
       required: true

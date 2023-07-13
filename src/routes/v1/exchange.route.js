@@ -7,6 +7,9 @@ const exchangeController = require('../../controllers/exchange.controller');
 const router = express.Router();
 
 router
+  .route('/priceByPairAllExchanges')
+  .get(exchangeController.getpriceByPairAllExchanges);
+router
   .route('/')
   .get(exchangeController.getExchanges);
 
@@ -14,9 +17,7 @@ router
   .route('/:id')
   .get(exchangeController.getExchangeById);
 
-router
-  .route('/priceByPairAllExchanges')
-  .get(exchangeController.getpriceByPairAllExchanges);
+
 
 
 

@@ -41,6 +41,7 @@ module.exports = {
       useCreateIndex: true,
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      dbName: 'crypto-towerbank'
     },
   },
   jwt: {

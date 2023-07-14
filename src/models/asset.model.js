@@ -13,6 +13,14 @@ const assetSchema = mongoose.Schema(
       required: true,
       index: true,
     },
+    logo: {
+      type: String,
+      required: true
+    },
+    logo_blank: {
+      type: String,
+      required: true
+    },
   },
   {
     timestamps: true,

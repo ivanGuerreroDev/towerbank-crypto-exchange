@@ -1,3 +1,4 @@
+const { ApiCall, TowerbankApi, TowerbankToken } = require('../utils/Api');
 const { Exchange } = require('../models');
 
 const getBalancesByCrypto = async (coin) => {
@@ -32,6 +33,24 @@ const getBalancesByCrypto = async (coin) => {
   return balance;
 };
 
+const getBalanceByAccount = async (accountId) => {
+  const { data: towerbankUserInfoResponse } = await ApiCall({
+    base: TowerbankApi,
+    path: '/v1/account',
+    headers: {
+      Authorization: `Bearer ${TowerbankToken}`,
+      'User-Agent': 'PostmanRuntime/7.32.3',
+    },
+    method: 'get',
+  });
+  const balance = {
+    balance: towerbankUserInfoResponse.balance,
+    account: accountId,
+  };
+  return balance;
+};
+
 module.exports = {
   getBalancesByCrypto,
+  getBalanceByAccount,
 };

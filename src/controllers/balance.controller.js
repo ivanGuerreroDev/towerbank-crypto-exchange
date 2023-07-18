@@ -8,6 +8,13 @@ const getBalancesByCrypto = catchAsync(async (req, res) => {
   res.status(httpStatus.ACCEPTED).send(balances);
 });
 
+const getBalanceByAccount = catchAsync(async (req, res) => {
+  const { accountId } = req.query;
+  const balance = await balanceService.getBalanceByAccount(accountId);
+  res.status(httpStatus.ACCEPTED).send(balance);
+});
+
 module.exports = {
   getBalancesByCrypto,
+  getBalanceByAccount,
 };

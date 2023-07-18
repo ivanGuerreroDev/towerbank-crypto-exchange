@@ -7,7 +7,7 @@ const { SignatureAndTimestampBinance } = require('../utils/SignatureBinance')
 const apiKey = '3y3J5plnNMBF9T87bZIox9EqJLhnHeI8f6tjTxaSlPK4Ov0eWSTh35joNMsqIT4L'
 const apiSecret = 'oIOV9vFZds2HdYCvNRn2bcAbr09QARellcHomH2KuMkhYpLSmQbuQWK6FfPu1K4W'
 const client = new Spot(apiKey, apiSecret, { baseURL: 'https://testnet.binance.vision' })
-const mongoose  = require('mongoose');
+const mongoose = require('mongoose');
 
 const getExchanges = async () => {
   const exchange = await Exchange.find();
@@ -30,50 +30,63 @@ const getpriceByPairAllExchanges = async (pair) => {
       if (response && response.status === 200) prices.push({
         id: exchange._id,
         name: exchange.name,
-        price: response.data.price
+        price: parseFloat(response?.data?.price).toFixed(2)
       })
     } else if (exchange.name === "Kraken") {
-      const { data: krakenResponse, status } = await ApiCall({
-        base: exchange.api_url,
-        path: '/0/public/Ticker',
-        method: 'get',
-        params: {
-          pair: pairArr[0] + pairArr[1]
+      try {
+        const { data: krakenResponse, status } = await ApiCall({
+          base: exchange.api_url,
+          path: '/0/public/Ticker',
+          method: 'get',
+          params: {
+            pair: pairArr[1] + pairArr[0]
+          }
+        })
+        if (krakenResponse && status === 200) {
+          prices.push({
+            id: exchange._id,
+            name: exchange.name,
+            price: parseFloat(krakenResponse?.result[Object.keys(krakenResponse?.result)?.[0]]?.a?.[0]).toFixed(2)
+          }
+          )
         }
-      })
-      if (krakenResponse && status === 200) {
-        prices.push({
-          id: exchange._id,
-          name: exchange.name,
-          price: krakenResponse.result[Object.keys(krakenResponse.result)[0]].a[0]
-        }
-        )
+      } catch (e) {
+        console.log(e)
       }
     } else if (exchange.name === "Buda") {
-      const { data: budaResponse, status } = await ApiCall({
-        base: exchange.api_url,
-        path: '/markets/' + pairArr[0] + '-' + pairArr[1] + '/ticker',
-        method: 'get'
-      })
-      if (budaResponse && status === 200) {
-        prices.push({
-          id: exchange._id,
-          name: exchange.name,
-          price: budaResponse.last_price[0]
+      try {
+        const { data: budaResponse, status } = await ApiCall({
+          base: exchange.api_url,
+          path: '/markets/' + pairArr[1] + '-' + pairArr[0] + '/ticker',
+          method: 'get'
         })
+        if (budaResponse && status === 200) {
+          console.log(budaResponse)
+          prices.push({
+            id: exchange._id,
+            name: exchange.name,
+            price: budaResponse.last_price[0]
+          })
+        }
+      } catch (e) {
+        console.log(e)
       }
     } else if (exchange.name === "Bitstamp") {
-      const { data: bitstampResponse, status } = await ApiCall({
-        base: exchange.api_url,
-        path: '/ticker/' + pairArr[0] + pairArr[1],
-        method: 'get'
-      })
-      if (bitstampResponse && status === 200) {
-        prices.push({
-          id: exchange._id,
-          name: exchange.name,
-          price: bitstampResponse.ask
+      try {
+        const { data: bitstampResponse, status } = await ApiCall({
+          base: exchange.api_url,
+          path: '/ticker/' + pairArr[1]?.toLowerCase() + 'usd',
+          method: 'get'
         })
+        if (bitstampResponse && status === 200) {
+          prices.push({
+            id: exchange._id,
+            name: exchange.name,
+            price: parseFloat(bitstampResponse?.ask)?.toFixed(2)
+          })
+        }
+      } catch (e) {
+        console.log(e)
       }
     }
   }

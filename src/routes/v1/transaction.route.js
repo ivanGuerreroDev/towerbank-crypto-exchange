@@ -1,26 +1,16 @@
 const express = require('express');
-const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const exchangeValidation = require('../../validations/exchange.validation');
 const exchangeController = require('../../controllers/exchange.controller');
+const transactionController = require('../../controllers/transaction.controller');
 
 const router = express.Router();
 
-router
-  .route('/newOrder')
-  .post(validate(exchangeValidation.newOrder), exchangeController.newOrder);
-
-router
-  .route('/quoteSwapRequest')
-  .post(validate(exchangeValidation.quoteSwapRequest), exchangeController.quoteSwapRequest);
-
-router
-  .route('/acceptQuoteAsset')
-  .post(validate(exchangeValidation.acceptQuoteAsset), exchangeController.acceptQuoteAsset);
-
-router
-  .route('/syncSwapRequest')
-  .post(validate(exchangeValidation.syncSwapRequest), exchangeController.syncSwapRequest);
+router.route('/getTransactions').get(transactionController.getTransactions);
+router.route('/newOrder').post(validate(exchangeValidation.newOrder), exchangeController.newOrder);
+router.route('/quoteSwapRequest').post(validate(exchangeValidation.quoteSwapRequest), exchangeController.quoteSwapRequest);
+router.route('/acceptQuoteAsset').post(validate(exchangeValidation.acceptQuoteAsset), exchangeController.acceptQuoteAsset);
+router.route('/syncSwapRequest').post(validate(exchangeValidation.syncSwapRequest), exchangeController.syncSwapRequest);
 
 module.exports = router;
 
@@ -29,6 +19,40 @@ module.exports = router;
  * tags:
  *   name: Transaction
  *   description: Crypto transactions
+ */
+
+/**
+ * @swagger
+ * /transaction/getTransactions:
+ *   get:
+ *     summary: Get all transactions
+ *     description: Get all transactions.
+ *     tags: [Transaction]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: crypto
+ *         required: true
+ *       - in: query
+ *         name: page
+ *         required: true
+ *       - in: query
+ *         name: limit
+ *         required: true
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *                $ref: '#/components/schemas/Transaction'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         $ref: '#/components/responses/NotFound'
  */
 
 /**
@@ -158,7 +182,6 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  */
 
-
 /**
  * @swagger
  * /transaction/syncSwapRequest/:
@@ -193,4 +216,3 @@ module.exports = router;
  *       "404":
  *         $ref: '#/components/responses/NotFound'
  */
-

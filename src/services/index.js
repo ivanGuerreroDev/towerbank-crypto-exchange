@@ -5,3 +5,5 @@ module.exports.userService = require('./user.service');
 module.exports.assetService = require('./asset.service');
 module.exports.exchangeService = require('./exchange.service');
 module.exports.subAccountService = require('./subAccount.service');
+module.exports.balanceService = require('./balance.service');
+module.exports.transactionService = require('./transaction.service');

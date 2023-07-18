@@ -7,7 +7,7 @@ const ApiError = require('../utils/ApiError');
  * @returns {Promise<Asset>}
  */
 const getAssets = async () => {
-  const assets = await Asset.find();
+  const assets = await Asset.find({active: true});
   return assets;
 };
 

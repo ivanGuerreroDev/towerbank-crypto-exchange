@@ -30,7 +30,7 @@ const getpriceByPairAllExchanges = async (pair) => {
       if (response && response.status === 200) prices.push({
         id: exchange._id,
         name: exchange.name,
-        price: response.data.price
+        price: parseFloat(response?.data?.price).toFixed(2)
       })
     } else if (exchange.name === "Kraken") {
       try {
@@ -39,15 +39,14 @@ const getpriceByPairAllExchanges = async (pair) => {
           path: '/0/public/Ticker',
           method: 'get',
           params: {
-            pair: pairArr[0] + pairArr[1]
+            pair: pairArr[1] + pairArr[0]
           }
         })
         if (krakenResponse && status === 200) {
-          console.log(krakenResponse)
           prices.push({
             id: exchange._id,
             name: exchange.name,
-            price: krakenResponse.result[Object.keys(krakenResponse.result)[0]].a[0]
+            price: parseFloat(krakenResponse?.result[Object.keys(krakenResponse?.result)?.[0]]?.a?.[0]).toFixed(2)
           }
           )
         }
@@ -58,7 +57,7 @@ const getpriceByPairAllExchanges = async (pair) => {
       try {
         const { data: budaResponse, status } = await ApiCall({
           base: exchange.api_url,
-          path: '/markets/' + pairArr[0] + '-' + pairArr[1] + '/ticker',
+          path: '/markets/' + pairArr[1] + '-' + pairArr[0] + '/ticker',
           method: 'get'
         })
         if (budaResponse && status === 200) {
@@ -76,15 +75,14 @@ const getpriceByPairAllExchanges = async (pair) => {
       try {
         const { data: bitstampResponse, status } = await ApiCall({
           base: exchange.api_url,
-          path: '/ticker/' + pairArr[0] + pairArr[1],
+          path: '/ticker/' + pairArr[1]?.toLowerCase() + 'usd',
           method: 'get'
         })
         if (bitstampResponse && status === 200) {
-          console.log(bitstampResponse)
           prices.push({
             id: exchange._id,
             name: exchange.name,
-            price: bitstampResponse.ask
+            price: parseFloat(bitstampResponse?.ask)?.toFixed(2)
           })
         }
       } catch (e) {

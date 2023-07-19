@@ -2,19 +2,19 @@ const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { balanceService } = require('../services');
 
-const getBalancesByCrypto = catchAsync(async (req, res) => {
+const getExchangeBalancesByCrypto = catchAsync(async (req, res) => {
   const { coin } = req.query;
-  const balances = await balanceService.getBalancesByCrypto(coin);
+  const balances = await balanceService.getExchangeBalancesByCrypto(coin);
   res.status(httpStatus.ACCEPTED).send(balances);
 });
 
-const getBalanceByAccount = catchAsync(async (req, res) => {
+const getFiatBalance = catchAsync(async (req, res) => {
   const { accountId } = req.query;
-  const balance = await balanceService.getBalanceByAccount(accountId);
+  const balance = await balanceService.getFiatBalance(accountId);
   res.status(httpStatus.ACCEPTED).send(balance);
 });
 
 module.exports = {
-  getBalancesByCrypto,
-  getBalanceByAccount,
+  getExchangeBalancesByCrypto,
+  getFiatBalance,
 };

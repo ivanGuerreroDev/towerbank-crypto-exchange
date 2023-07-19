@@ -3,8 +3,8 @@ const balanceController = require('../../controllers/balance.controller');
 
 const router = express.Router();
 
-router.route('/getBalancesByCrypto/').get(balanceController.getBalancesByCrypto);
-router.route('/getBalanceByAccount/').get(balanceController.getBalanceByAccount);
+router.route('/getExchangeBalancesByCrypto').get(balanceController.getExchangeBalancesByCrypto);
+router.route('/getFiatBalance').get(balanceController.getFiatBalance);
 
 module.exports = router;
 
@@ -17,7 +17,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /balance/getBalancesByCrypto:
+ * /balance/getExchangeBalancesByCrypto:
  *   get:
  *     summary: Get balance by crypto
  *     description: Get balance by crypto.
@@ -25,7 +25,7 @@ module.exports = router;
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
+ *       - in: query
  *         name: coin
  *         required: true
  *     responses:
@@ -45,7 +45,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /balance/getBalanceByAccount:
+ * /balance/getFiatBalance:
  *   get:
  *     summary: Get balance by Account
  *     description: Get balance by Account.
@@ -53,7 +53,7 @@ module.exports = router;
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
+ *       - in: query
  *         name: accountId
  *         required: true
  *     responses:

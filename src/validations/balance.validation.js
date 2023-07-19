@@ -1,11 +1,11 @@
 const Joi = require('joi');
 
-const getBalancesByCrypto = {
+const getExchangeBalancesByCrypto = {
   body: Joi.object().keys({
     coin: Joi.string().required(),
   }),
 };
 
 module.exports = {
-  getBalancesByCrypto,
+  getExchangeBalancesByCrypto,
 };

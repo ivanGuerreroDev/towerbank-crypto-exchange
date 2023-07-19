@@ -1,7 +1,7 @@
 const { ApiCall, TowerbankApi, TowerbankToken } = require('../utils/Api');
 const { Exchange } = require('../models');
 
-const getBalancesByCrypto = async (coin) => {
+const getExchangeBalancesByCrypto = async (coin) => {
   const exchanges = await Exchange.find({ active: true });
   const dteChanges = [];
   let crypto = coin;
@@ -9,7 +9,7 @@ const getBalancesByCrypto = async (coin) => {
     const factor = Math.random() * 10;
     const exc = {
       name: exchange.name,
-      log: exchange.logo,
+      logo: exchange.logo,
       balance: parseFloat((500 * factor).toFixed(2)),
       balance_fiat: parseFloat((100 * factor).toFixed(2)),
     };
@@ -33,7 +33,7 @@ const getBalancesByCrypto = async (coin) => {
   return balance;
 };
 
-const getBalanceByAccount = async (accountId) => {
+const getFiatBalance = async (accountId) => {
   const { data: towerbankUserInfoResponse } = await ApiCall({
     base: TowerbankApi,
     path: '/v1/account',
@@ -51,6 +51,6 @@ const getBalanceByAccount = async (accountId) => {
 };
 
 module.exports = {
-  getBalancesByCrypto,
-  getBalanceByAccount,
+  getExchangeBalancesByCrypto,
+  getFiatBalance,
 };

@@ -1,27 +1,14 @@
 const express = require('express');
-const auth = require('../../middlewares/auth');
-const validate = require('../../middlewares/validate');
-const exchangeValidation = require('../../validations/exchange.validation');
 const exchangeController = require('../../controllers/exchange.controller');
 
 const router = express.Router();
-router
-  .route('/priceByPairAllExchanges')
-  .get(exchangeController.getpriceByPairAllExchanges);
-router
-  .route('/')
-  .get(exchangeController.getExchanges);
 
-router
-  .route('/:id')
-  .get(exchangeController.getExchangeById);
-
-
-
-
+router.route('/priceByPairAllExchanges').get(exchangeController.getpriceByPairAllExchanges);
+router.route('/getMontoMinByExchange').get(exchangeController.getMontoMinByExchange);
+router.route('/').get(exchangeController.getExchanges);
+router.route('/:id').get(exchangeController.getExchangeById);
 
 module.exports = router;
-
 
 /**
  * @swagger
@@ -53,7 +40,6 @@ module.exports = router;
  *       "404":
  *         $ref: '#/components/responses/NotFound'
  */
-
 
 /**
  * @swagger
@@ -103,6 +89,42 @@ module.exports = router;
  *           type: string
  *         description:
  *           Pair assets: BTC/USDT
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *                $ref: '#/components/schemas/Exchange'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         $ref: '#/components/responses/NotFound'
+ */
+
+/**
+ * @swagger
+ * /exchange/getMontoMinByExchange:
+ *   get:
+ *     summary: Get monto min by Exhcnage
+ *     description: Get monto min by Exhcnage.
+ *     tags: [Exchange]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: pair
+ *         required: true
+ *         description:
+ *           Pair: BTC/USDT
+ *       - in: query
+ *         name: exchangeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Exchange id
  *     responses:
  *       "200":
  *         description: OK

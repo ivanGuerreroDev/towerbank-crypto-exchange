@@ -1,29 +1,19 @@
-
 const express = require('express');
-const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const subAccountValidation = require('../../validations/subAccount.validation');
 const subAccountController = require('../../controllers/subAccount.controller');
 
 const router = express.Router();
 
-
 router
   .route('/getAllSubAccounts/:userId')
   .post(validate(subAccountValidation.getAllSubAccounts), subAccountController.getAllSubAccounts);
-
 router
   .route('/getSubAccountById/:subAccountId')
   .post(validate(subAccountValidation.getSubAccountById), subAccountController.getSubAccountById);
-
-router
-  .route('/addSubAccount')
-  .post(validate(subAccountValidation.addSubAccount), subAccountController.addSubAccount);
-
+router.route('/addSubAccount').post(validate(subAccountValidation.addSubAccount), subAccountController.addSubAccount);
 
 module.exports = router;
-
-
 
 /**
  * @swagger
@@ -62,7 +52,6 @@ module.exports = router;
  *       "404":
  *         $ref: '#/components/responses/NotFound'
  */
-
 
 /**
  * @swagger
@@ -132,4 +121,3 @@ module.exports = router;
  *       "404":
  *         $ref: '#/components/responses/NotFound'
  */
-

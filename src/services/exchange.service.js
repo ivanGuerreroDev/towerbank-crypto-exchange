@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Exchange, SwapRequest, User, Order, Wallet, Asset } = require('../models');
+const { Exchange, SwapRequest, User, Order } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { ApiCall, TowerbankApi, TowerbankToken } = require('../utils/Api');
 const { Spot } = require('@binance/connector')
@@ -19,18 +19,17 @@ const getExchangeById = async (id) => {
   return exchange;
 };
 
-
 const getpriceByPairAllExchanges = async (pair) => {
   const exchanges = await Exchange.find({ active: true });
   const prices = [];
   for (const exchange of exchanges) {
     const pairArr = pair.split("/");
-    if (exchange?.api_url && exchange?.name === "Binance") {
+    if (exchange.api_url && exchange.name === "Binance") {
       const response = await client.avgPrice(pairArr[1].toUpperCase() + pairArr[0].toUpperCase())
       if (response && response.status === 200) prices.push({
         id: exchange._id,
         name: exchange.name,
-        price: parseFloat(response?.data?.price).toFixed(2)
+        price: parseFloat(response.data.price).toFixed(2)
       })
     } else if (exchange.name === "Kraken") {
       try {
@@ -46,7 +45,7 @@ const getpriceByPairAllExchanges = async (pair) => {
           prices.push({
             id: exchange._id,
             name: exchange.name,
-            price: parseFloat(krakenResponse?.result[Object.keys(krakenResponse?.result)?.[0]]?.a?.[0]).toFixed(2)
+            price: parseFloat(krakenResponse.result[Object.keys(krakenResponse.result)?.[0]]?.a?.[0]).toFixed(2)
           }
           )
         }
@@ -308,6 +307,148 @@ const syncSwapRequest = async (orderId) => {
   }
 }
 
+const getMontoMinByExchange = async (pair, exchangeId) => {
+  const exchange = await Exchange.findById(new mongoose.Types.ObjectId(exchangeId.trim()));
+  const montoMin = {pair:null, minSell:null, minBuy:null , exchange: null};
+  const pairArr = pair.split("/");
+
+  montoMin.exchange = exchange?.name;
+
+  switch (exchange?.name) {
+    case 'Binance':
+      try {
+        const { data: dataResponse, status } = await ApiCall({
+          base: 'https://api.binance.com/api',
+          path: '/v3/exchangeInfo',
+          method: 'get'
+        })
+        if (dataResponse && status === 200) {
+          const symbols = dataResponse.symbols;
+          const symbolInfo = symbols.find((symbol) => symbol.symbol === pairArr[0]+pairArr[1]);
+
+          if (!symbolInfo) {
+            montoMin.pair = pair;
+            return montoMin;
+          }
+          // Obtener los montos mínimos de una transacción de compra y venta
+          const lotSizeFilter = symbolInfo.filters.find((filter) => filter.filterType === 'LOT_SIZE');
+          const minNotionalFilter = symbolInfo.filters.find((filter) => filter.filterType === 'NOTIONAL');
+
+          const minQty = parseFloat(lotSizeFilter.minQty);
+          const minNotional = parseFloat(minNotionalFilter.minNotional);
+
+          montoMin.pair = pair;
+          montoMin.minBuy = minNotional;
+          montoMin.minSell = minQty;
+
+        }
+      } catch (e) {
+        console.log(e)
+      }
+      break;
+
+    case 'Kraken':
+      try {
+        const { data: dataResponse, status } = await ApiCall({
+          base: 'https://api.kraken.com/0',
+          path: '/public/AssetPairs',
+          method: 'get'
+        })
+        if (dataResponse && status === 200) {
+          const pairs = dataResponse.result;
+          const pairFiltr =pairArr[0]+pairArr[1];
+          const symbolInfo = pairs[pairFiltr];
+
+          if (!symbolInfo) {
+            montoMin.pair = pair;
+            return montoMin;
+          }
+          // Obtener los montos mínimos de una transacción de compra y venta
+          const minQty = parseFloat(symbolInfo.lot_decimals);
+          const minNotional = parseFloat(symbolInfo.ordermin);
+
+          montoMin.pair = pair;
+          montoMin.minBuy = minNotional;
+          montoMin.minSell = minQty;
+
+        }
+      } catch (e) {
+        console.log(e)
+      }
+      break;
+
+    case 'Buda':
+      try {
+        const { data: dataResponse, status } = await ApiCall({
+          base: 'https://www.buda.com/api',
+          path: '/v2/markets',
+          method: 'get'
+        })
+        if (dataResponse && status === 200) {
+          const markets = dataResponse.markets;
+          const pairFiltr =pairArr[0]+'-'+pairArr[1];
+
+          const marketInfo = markets.find((market) => market.id === pairFiltr);
+
+          if (!markets || markets.length === 0) {
+            montoMin.pair = pair;
+            return montoMin;
+          }
+          // Obtener los montos mínimos de una transacción de compra y venta
+          const lotSizeFilter = {
+            minQty: parseFloat(marketInfo.min_amount),
+          };
+
+          const minNotionalFilter = {
+            minNotional: parseFloat(marketInfo.min_total),
+          };
+
+          const minNotional = parseFloat(symbolInfo.ordermin);
+
+          montoMin.pair = pair;
+          montoMin.minBuy = lotSizeFilter.minQty;
+          montoMin.minSell =  minNotionalFilter.minNotional;
+
+        }
+      } catch (e) {
+        console.log(e)
+      }
+      break;
+
+    case 'Bitstamp':
+      try {
+        const { data: dataResponse, status } = await ApiCall({
+          base: 'https://www.bitstamp.net/api',
+          path: '/v2/trading-pairs-info/',
+          method: 'get'
+        })
+        if (dataResponse && status === 200) {
+
+          const tradingPairs  = dataResponse;
+          const pairInfo = tradingPairs.find((pairInfo) => pairInfo.name === pair);
+
+
+          if (!tradingPairs || tradingPairs.length === 0 || !pairInfo) {
+            montoMin.pair = pair;
+            return montoMin;
+          }
+          // Obtener los montos mínimos de una transacción de compra y venta
+          const minimumOrder = parseFloat(pairInfo.minimum_order.split(' ')[0]);
+
+          montoMin.pair = pair;
+          montoMin.minBuy = minimumOrder;
+          montoMin.minSell =  minimumOrder;
+
+        }
+      } catch (e) {
+        console.log(e)
+      }
+      break;
+  }
+  return montoMin;
+};
+
+
 module.exports = {
   getExchanges,
   getExchangeById,
@@ -316,5 +457,6 @@ module.exports = {
   acceptQuoteAsset,
   syncSwapRequest,
   newOrderTrade,
-  syncOrders
+  syncOrders,
+  getMontoMinByExchange,
 };

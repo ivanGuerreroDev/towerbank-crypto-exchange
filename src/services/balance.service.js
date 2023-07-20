@@ -1,5 +1,9 @@
 const { ApiCall, TowerbankApi, TowerbankToken } = require('../utils/Api');
 const { Exchange } = require('../models');
+const { Spot } = require('@binance/connector')
+const apiKey = '3y3J5plnNMBF9T87bZIox9EqJLhnHeI8f6tjTxaSlPK4Ov0eWSTh35joNMsqIT4L'
+const apiSecret = 'oIOV9vFZds2HdYCvNRn2bcAbr09QARellcHomH2KuMkhYpLSmQbuQWK6FfPu1K4W'
+const client = new Spot(apiKey, apiSecret, { baseURL: 'https://testnet.binance.vision' })
 
 const getExchangeBalancesByCrypto = async (coin) => {
   const exchanges = await Exchange.find({ active: true });
@@ -49,6 +53,7 @@ const getFiatBalance = async (accountId) => {
   };
   return balance;
 };
+
 
 module.exports = {
   getExchangeBalancesByCrypto,

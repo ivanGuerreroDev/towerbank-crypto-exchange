@@ -30,7 +30,7 @@ const getpriceByPairAllExchanges = async (pair) => {
       if (response && response.status === 200) prices.push({
         id: exchange._id,
         name: exchange.name,
-        price: parseFloat(response?.data?.price).toFixed(2)
+        price: parseFloat(response?.data?.price)
       })
     } else if (exchange.name === "Kraken") {
       try {
@@ -46,7 +46,7 @@ const getpriceByPairAllExchanges = async (pair) => {
           prices.push({
             id: exchange._id,
             name: exchange.name,
-            price: parseFloat(krakenResponse?.result[Object.keys(krakenResponse?.result)?.[0]]?.a?.[0]).toFixed(2)
+            price: parseFloat(krakenResponse?.result[Object.keys(krakenResponse?.result)?.[0]]?.a?.[0])
           }
           )
         }
@@ -82,7 +82,7 @@ const getpriceByPairAllExchanges = async (pair) => {
           prices.push({
             id: exchange._id,
             name: exchange.name,
-            price: parseFloat(bitstampResponse?.ask)?.toFixed(2)
+            price: parseFloat(bitstampResponse?.ask)
           })
         }
       } catch (e) {

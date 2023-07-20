@@ -7,3 +7,4 @@ module.exports.exchangeService = require('./exchange.service');
 module.exports.subAccountService = require('./subAccount.service');
 module.exports.balanceService = require('./balance.service');
 module.exports.transactionService = require('./transaction.service');
+module.exports.extWalletService = require('./extWallet.service');

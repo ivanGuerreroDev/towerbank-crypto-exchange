@@ -7,6 +7,7 @@ const exchangeRoute = require('./exchange.route');
 const subAccountRoute = require('./subAccount.route');
 const transactionRoute = require('./transaction.route');
 const balanceRoute = require('./balance.route');
+const extWalletRoute = require('./extWallet.route');
 
 const config = require('../../config/config');
 
@@ -40,6 +41,10 @@ const defaultRoutes = [
   {
     path: '/balance',
     route: balanceRoute,
+  },
+  {
+    path: '/extWallet',
+    route: extWalletRoute,
   },
 ];
 

@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Exchange, SwapRequest, User, Order } = require('../models');
+const { Exchange, SwapRequest, User, Order, Wallet, Asset } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { ApiCall, TowerbankApi, TowerbankToken } = require('../utils/Api');
 const { Spot } = require('@binance/connector')

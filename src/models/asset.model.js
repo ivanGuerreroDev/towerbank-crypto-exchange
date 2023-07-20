@@ -3,7 +3,6 @@ const { toJSON } = require('./plugins');
 
 const assetSchema = mongoose.Schema(
   {
-    _id: mongoose.ObjectId,
     name: {
       type: String,
       required: true

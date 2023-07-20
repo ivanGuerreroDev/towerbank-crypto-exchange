@@ -5,7 +5,6 @@ const exchangeValidation = require('../../validations/exchange.validation');
 const exchangeController = require('../../controllers/exchange.controller');
 
 const router = express.Router();
-
 router
   .route('/priceByPairAllExchanges')
   .get(exchangeController.getpriceByPairAllExchanges);

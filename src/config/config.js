@@ -62,4 +62,9 @@ module.exports = {
     },
     from: envVars.EMAIL_FROM,
   },
+  test: {
+    user: {
+      towerbankUserId: envVars.TOWERBANK_USER_ID
+    }
+  }
 };

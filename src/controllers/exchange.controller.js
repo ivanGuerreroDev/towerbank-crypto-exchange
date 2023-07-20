@@ -54,4 +54,4 @@ module.exports = {
   acceptQuoteAsset,
   syncSwapRequest,
   newOrder
-};
+}

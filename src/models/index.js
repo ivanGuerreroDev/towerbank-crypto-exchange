@@ -5,3 +5,5 @@ module.exports.Exchange = require('./exchange.model');
 module.exports.SubAccount = require('./subAccount.model');
 module.exports.Order = require('./order.model');
 module.exports.SwapRequest = require('./swapRequest.model');
+module.exports.ExtWallet = require('./extWallet.model');
+module.exports.WalletType = require('./walletType.model');

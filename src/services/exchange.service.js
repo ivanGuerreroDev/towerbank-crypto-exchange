@@ -105,19 +105,15 @@ const newOrderTrade = async (userId, exchangeId, symbol, amount, side) => {
       const response = {
         "symbol": symbol.replace('/', '').toUpperCase(),
         "orderId": Math.random(),
-        "orderListId": -1,
         "clientOrderId": userId,
         "transactTime": transactTime,
-        "price": "0.00000000",
         "origQty": amount,
         "executedQty": amount,
-        "cummulativeQuoteQty": amount,
         "status": "SUCCESS",
         "timeInForce": "GTC",
         "type": "MARKET",
         "side": side,
-        "workingTime": workingTime,
-        "selfTradePreventionMode": "NONE"
+        "workingTime": workingTime
       };
 
       await Order.create({

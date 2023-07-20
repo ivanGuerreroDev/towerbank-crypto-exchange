@@ -8,6 +8,7 @@ const apiKey = '3y3J5plnNMBF9T87bZIox9EqJLhnHeI8f6tjTxaSlPK4Ov0eWSTh35joNMsqIT4L
 const apiSecret = 'oIOV9vFZds2HdYCvNRn2bcAbr09QARellcHomH2KuMkhYpLSmQbuQWK6FfPu1K4W'
 const client = new Spot(apiKey, apiSecret, { baseURL: 'https://testnet.binance.vision' })
 const mongoose = require('mongoose');
+const { deleteUserById } = require('./user.service');
 
 const getExchanges = async () => {
   const exchange = await Exchange.find();
@@ -94,9 +95,42 @@ const getpriceByPairAllExchanges = async (pair) => {
 
 const newOrderTrade = async (userId, exchangeId, symbol, amount, side) => {
   const exchange = await Exchange.findById(new mongoose.Types.ObjectId(exchangeId.trim()));
-  if (validateBalanceForTrx(userId, amount)) {
-    if (exchange?.name === "Binance") {
-      let params = {
+  //if (validateBalanceForTrx(userId, amount)) {
+
+    const transactTime = Date.now();
+    const workingTime = Date.now();
+
+    //if (exchange?.name === "Binance") {
+
+      const response = {
+        "symbol": symbol.replace('/', '').toUpperCase(),
+        "orderId": Math.random(),
+        "orderListId": -1,
+        "clientOrderId": userId,
+        "transactTime": transactTime,
+        "price": "0.00000000",
+        "origQty": amount,
+        "executedQty": amount,
+        "cummulativeQuoteQty": amount,
+        "status": "SUCCESS",
+        "timeInForce": "GTC",
+        "type": "MARKET",
+        "side": side,
+        "workingTime": workingTime,
+        "selfTradePreventionMode": "NONE"
+      };
+
+      await Order.create({
+        ...response,
+        exchange: mongoose.Types.ObjectId(exchangeId.trim()),
+        user: mongoose.Types.ObjectId(userId.trim()),
+      })
+
+      await transactionTowerbank(response, userId)
+
+      return response;
+
+      /*let params = {
         symbol: symbol.replace('/', '').toUpperCase(),
         side: side.toUpperCase(),
         type: 'MARKET',
@@ -125,14 +159,15 @@ const newOrderTrade = async (userId, exchangeId, symbol, amount, side) => {
           await transactionTowerbank(binanceResponse, userId)
         }
         return binanceResponse;
-      }
-    } else {
-      console.info(binanceResponse?.message)
-      throw new ApiError(httpStatus.BAD_REQUEST, binanceResponse?.message || 'New Order Error');
-    }
-  } else {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Insufficient funds');
-  }
+      }*/
+
+    //} else {
+    //  console.info(binanceResponse?.message)
+    //  throw new ApiError(httpStatus.BAD_REQUEST, binanceResponse?.message || 'New Order Error');
+    //}
+  //} else {
+  //  throw new ApiError(httpStatus.BAD_REQUEST, 'Insufficient funds');
+  //}
 }
 
 const syncOrders = async () => {
